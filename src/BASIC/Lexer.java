@@ -157,7 +157,26 @@ public class Lexer {
      * @return a token that contains the NUMBER type and the string of the number
      * @throws Exception when an unexpected character is seen
      */
-    private Token processNumber() throws Exception{return null;}
+    private Token processNumber() throws Exception{
+        int decimal = 0;
+        while (!Character.isWhitespace(currentChar) && !Document.isDone()) {
+            if (Character.isDigit(currentChar)) {
+                processedString += currentChar;
+                position++;
+            } else if (currentChar == '.') {
+                decimal++;
+                if(decimal > 1){
+                    throw new Exception("Error: Too many decimal points @ " + line + ":" + position);
+                }
+                processedString += currentChar;
+                position++;
+            } else if(Document.isDone()){
+                break;
+            }
+            currentChar = Document.getChar();
+        }
+        return new Token(Token.TokenType.NUMBER, processedString);
+    }
 
     /**
      * Processes the current String and creates a token for it
@@ -171,5 +190,14 @@ public class Lexer {
      * @return a token that contains the STRINGLITERAL type and the string of the number
      * @throws Exception when an unexpected character is seen or if there are an uneven number of quotations
      */
-    private Token handleStringLiteral() throws Exception{return null;}
+    private Token handleStringLiteral() throws Exception{
+        qCount++;
+        while(currentChar != '"'){
+            processedString += currentChar;
+            currentChar = Document.getChar();
+            position++;
+        }
+        if (qCount % 2 != 0) throw new Exception("Unfinished quote");
+        return new Token(Token.TokenType.STRINGLITERAL, processedString);
+    }
 }
