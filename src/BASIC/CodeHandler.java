@@ -14,7 +14,7 @@ public class CodeHandler {
      * @return the ith character ahead of the current index
      */
     public char peek(int i){
-        int peekI = index + i;
+        int peekI = (index - 1) + i;
         if(peekI > 0 && peekI <= document.length()-1){
             return document.charAt(peekI);
         }

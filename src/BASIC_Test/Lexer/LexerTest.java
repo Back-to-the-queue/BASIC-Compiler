@@ -8,9 +8,15 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class LexerTest {
     private String readTestFile(String filePath) throws Exception {
-        System.out.println("Looking for file at: " + Path.of(filePath).toAbsolutePath());
         return Files.readString(Path.of(filePath), StandardCharsets.UTF_8);
     }
+
+    @Test
+    public void TestCodeHandler() throws Exception{
+        CodeHandler handler = new CodeHandler(readTestFile("/Users/nicolasquesada/Documents/BASICpt2/src/BASIC_Test/Lexer/ProcessWordTest"));
+
+    }
+
 
     @Test
     public void TestProcessWord() throws Exception {
@@ -22,7 +28,7 @@ public class LexerTest {
 
     }
 
-    public void TestProcessNumber() throws Exception {
+    /*public void TestProcessNumber() throws Exception {
         String testInput = readTestFile("/Users/nicolasquesada/Documents/BASICpt2/src/BASIC_Test/Lexer/ProcessNumberTest");
         Lexer lexer = new Lexer(testInput);
         lexer.lex();
@@ -44,5 +50,5 @@ public class LexerTest {
         lexer.lex();
         java.util.LinkedList<BASIC.Token> tokens = lexer.tokenList;
 
-    }
+    }*/
 }

@@ -129,17 +129,21 @@ public class Lexer {
             if(Character.isLetter(currentChar) || Character.isDigit(currentChar) || currentChar == '_'){
                 processedString += currentChar;
                 position++;
-                System.out.println(Document.peek(1));
             }
             if(Document.peek(1) == ':'){
                 currentChar = Document.getChar();
                 position++;
-                processedString += currentChar;
                 Document.swallow(1);
                 return new Token(Token.TokenType.LABEL, processedString);
             }
-            else if (keyWords.containsKey(processedString) && ((Character.isWhitespace(currentChar) || currentChar == '\n'))){
+            else if (keyWords.containsKey(processedString) && ((Character.isWhitespace(Document.peek(1)) || Document.peek(1) == '\n' || Document.isDone()))){
             return new Token(String.valueOf(keyWords.get(processedString.toLowerCase())));
+            }
+            else if(functions.containsKey(processedString) && ((Document.peek(1) == '$') || (Document.peek(1) == '%'))){
+                currentChar = Document.getChar();
+                position++;
+                Document.swallow(1);
+                return new Token(String.valueOf(functions.get(processedString.toLowerCase())));
             }
             else if(Document.isDone()){
                 break;
