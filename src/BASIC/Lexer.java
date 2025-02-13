@@ -1,6 +1,5 @@
 package BASIC;
 
-import javax.print.Doc;
 import java.util.HashMap;
 import java.util.LinkedList;
 
@@ -50,7 +49,6 @@ public class Lexer {
         twoCharExp.put("+=", Token.TokenType.PLUSEQUAL);
         twoCharExp.put("-=", Token.TokenType.MINUSEQUAL);
         twoCharExp.put("!~", Token.TokenType.NOMATCH);
-        twoCharExp.put("", Token.TokenType.EQUALS);
         twoCharExp.put("&&", Token.TokenType.AND);
         twoCharExp.put(">>", Token.TokenType.APPEND);
         twoCharExp.put("||", Token.TokenType.OR);
@@ -77,6 +75,7 @@ public class Lexer {
         oneCharExp.put(";", Token.TokenType.SEMICOLON);
         oneCharExp.put("|", Token.TokenType.LINE);
         oneCharExp.put(",", Token.TokenType.COMMA);
+        oneCharExp.put("&" , Token.TokenType.AMPERSAND);
 
     }
 
@@ -187,7 +186,21 @@ public class Lexer {
      * @return a token that contains the type of symbol and the string of the symbol
      * @throws Exception when an unexpected character is seen
      */
-    private Token processSymbol() throws Exception{return null;}
+    private Token processSymbol() throws Exception{
+        if(twoCharExp.containsKey(currentChar + String.valueOf(Document.peek(1)))){
+            processedString += currentChar;
+            currentChar = Document.getChar();
+            processedString += currentChar;
+            return new Token(twoCharExp.get(processedString), line, position);
+        }
+        else if(currentChar == '&' && Document.peek(1) != '&'){
+            throw new Exception("Invalid character @ " + line + ":" + position + '\n' + "& expected");
+        }
+        else{
+            processedString += currentChar;
+            return new Token(oneCharExp.get(processedString), line, position);
+        }
+    }
 
     /**
      * Processes the current String Literal and creates a token for it
