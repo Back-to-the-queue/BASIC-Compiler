@@ -15,7 +15,7 @@ public class CodeHandler {
      */
     public char peek(int i){
         int peekI = index + i;
-        if(peekI > 0 && peekI <= document.length()){
+        if(peekI > 0 && peekI <= document.length()-1){
             return document.charAt(peekI);
         }
         return 0;
@@ -28,7 +28,7 @@ public class CodeHandler {
      */
     public String peekString(int i){
         int peekI = index + i;
-        if(peekI > 0 && peekI <= document.length()){
+        if(peekI > 0 && peekI <= document.length()-1){
             return document.substring(index, peekI);
         }
         return null;

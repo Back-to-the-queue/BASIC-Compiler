@@ -129,17 +129,16 @@ public class Lexer {
             if(Character.isLetter(currentChar) || Character.isDigit(currentChar) || currentChar == '_'){
                 processedString += currentChar;
                 position++;
-                currentChar = Document.getChar();
+                System.out.println(Document.peek(1));
             }
             if(Document.peek(1) == ':'){
-                processedString += currentChar;
-                position++;
                 currentChar = Document.getChar();
+                position++;
                 processedString += currentChar;
                 Document.swallow(1);
                 return new Token(Token.TokenType.LABEL, processedString);
             }
-            if (keyWords.containsKey(processedString) && (Character.isWhitespace(currentChar) || currentChar == '\n')){
+            else if (keyWords.containsKey(processedString) && ((Character.isWhitespace(currentChar) || currentChar == '\n'))){
             return new Token(String.valueOf(keyWords.get(processedString.toLowerCase())));
             }
             else if(Document.isDone()){
@@ -148,6 +147,7 @@ public class Lexer {
             else if(!Character.isLetter(currentChar) && !Character.isDigit(currentChar) && currentChar != '_' && !Character.isWhitespace(currentChar)){
                 throw new Exception("Invalid character @ " + line + ":" + position);
             }
+            currentChar = Document.getChar();
         }
         return new Token(Token.TokenType.WORD, processedString);
     }
