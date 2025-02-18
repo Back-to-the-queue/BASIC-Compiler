@@ -1,0 +1,17 @@
+BEGIN {
+    print "Starting AWK program..."
+    x = 10
+    y = x + 5
+}
+
+{
+    if ($1 ~ /^[A-Za-z]+$/) {
+        print "Word detected:", $1
+    } else {
+        print "Number:", $1
+    }
+}
+
+END {
+    print "Program finished."
+}

@@ -13,11 +13,11 @@ public class Token {
      *
      */
     public enum TokenType{
-        WORD, NUMBER, SEPARATOR, STRINGLITERAL, INPUT, PRINT, READ, DATA, GOSUB, FOR, IF, TO, STEP, RETURN, NEXT, THEN,
+        BEGIN, WORD, NUMBER, SEPARATOR, STRINGLITERAL, INPUT, PRINT, READ, DATA, GOSUB, FOR, IF, TO, STEP, RETURN, NEXT, THEN,
         FUNCTION, WHILE, END, LESSTHAN, GREATERTHAN, LESSEQUAL, GREATEREQUAL, EQUALS, DECREMENT, INCREMENT, EXPONENTEQUAL,
         MODEQUAL, TIMESEQUAL, DIVIDEEQUAL, PLUSEQUAL, MINUSEQUAL, NOMATCH, AND, APPEND, OR, NOTEQUAL, LCBRACE, RCBRACE,
         LBRACE, RBRACE, MATCH, EQUAL, NOT, EXPONENT, TERNARY, COLON, MOD, SEMICOLON, LINE, LPAREN, RPAREN, TIMES, PLUS,
-        MINUS, DIVIDE, LABEL, COMMA, MID, RANDOM, LEFT, RIGHT, NUM, VAL, AMPERSAND;
+        MINUS, DIVIDE, LABEL, COMMA, MID, RANDOM, LEFT, RIGHT, NUM, VAL, AMPERSAND, DOLLAR;
     }
 
     /**
@@ -43,7 +43,7 @@ public class Token {
     }
 
     /**
-     * Constructor for key words to convert to Tokens
+     * Constructor for keywords to convert to Tokens
      */
     public Token(String str){
         if(TokenType.valueOf(str.toUpperCase()).toString().equals(str.toUpperCase()))

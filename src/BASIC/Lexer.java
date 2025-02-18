@@ -22,7 +22,7 @@ public class Lexer {
     HashMap<String, Token.TokenType> twoCharExp = new HashMap<>(); //Hashmap to store our two character expressions
     HashMap<String, Token.TokenType> oneCharExp = new HashMap<>(); //Hashmap to store our one character expressions
     final String[] FUNCTIONS = {"random", "left", "right", "mid", "num", "val"};
-    final String[] DEFINEDWORDS = {"read", "print", "input", "data", "gosub", "for", "to", "step", "next",
+    final String[] DEFINEDWORDS = {"begin", "read", "print", "input", "data", "gosub", "for", "to", "step", "next",
             "return", "if", "then", "function", "while", "end", "random"};
     /**
      *Constructor passes the document to CodeHandler
@@ -76,6 +76,7 @@ public class Lexer {
         oneCharExp.put("|", Token.TokenType.LINE);
         oneCharExp.put(",", Token.TokenType.COMMA);
         oneCharExp.put("&" , Token.TokenType.AMPERSAND);
+        oneCharExp.put("$" , Token.TokenType.DOLLAR);
 
     }
 
@@ -84,16 +85,16 @@ public class Lexer {
      * @throws Exception when an unexpected character is seen
      */
     public void lex() throws Exception {
-        System.out.println("Document: " + Document.remainder());
         while(!Document.isDone()){
+            if(currentChar == '\n') {
+                line++;
+                position = 0;
+                tokenList.add(new Token(Token.TokenType.SEPARATOR, ""));
+            }
             currentChar = Document.getChar(); //sets the current character to the
             Token processedToken; //holds the token created by processWord & processNumber
             if(Character.isWhitespace(currentChar)){
                 position++;
-            } else if(currentChar == '\n'){
-                line++;
-                position = 0;
-                tokenList.add(new Token(Token.TokenType.SEPARATOR, ""));
             } else if(currentChar == '\r'){
                 position++;
                 Document.swallow(1);
@@ -106,6 +107,7 @@ public class Lexer {
                 tokenList.add(processedToken);
                 processedString = "";
             } else if(currentChar == '"'){
+                qCount = 0;
                 processedToken = handleStringLiteral();
                 tokenList.add(processedToken);
                 processedString = "";
@@ -113,8 +115,9 @@ public class Lexer {
                 processedToken = processSymbol();
                 tokenList.add(processedToken);
                 processedString = "";
+            } else {
+                throw new Exception("Invalid character @ " + line + ":" + position);
             }
-            System.out.println("TokenList: " + tokenList);
         }
     }
 
@@ -135,7 +138,7 @@ public class Lexer {
                 Document.swallow(1);
                 return new Token(Token.TokenType.LABEL, processedString);
             }
-            else if (keyWords.containsKey(processedString) && ((Character.isWhitespace(Document.peek(1)) || Document.peek(1) == '\n' || Document.isDone()))){
+            else if (keyWords.containsKey(processedString.toLowerCase()) && (Character.isWhitespace(Document.peek(1)) || Document.peek(1) == '\n' || Document.isDone() || oneCharExp.containsKey(String.valueOf(Document.peek(1))))){
             return new Token(String.valueOf(keyWords.get(processedString.toLowerCase())));
             }
             else if(functions.containsKey(processedString) && ((Document.peek(1) == '$') || (Document.peek(1) == '%'))){
@@ -147,6 +150,7 @@ public class Lexer {
             else if(Document.isDone()){
                 break;
             }
+            else if(oneCharExp.containsKey(String.valueOf(Document.peek(1)))) break;
             else if(!Character.isLetter(currentChar) && !Character.isDigit(currentChar) && currentChar != '_' && !Character.isWhitespace(currentChar)){
                 throw new Exception("Invalid character @ " + line + ":" + position);
             }
@@ -162,7 +166,7 @@ public class Lexer {
      */
     private Token processNumber() throws Exception{
         int decimal = 0;
-        while (!Character.isWhitespace(currentChar) && !Document.isDone()) {
+        while (!Character.isWhitespace(currentChar)) {
             if (Character.isDigit(currentChar)) {
                 processedString += currentChar;
                 position++;
@@ -189,8 +193,10 @@ public class Lexer {
     private Token processSymbol() throws Exception{
         if(twoCharExp.containsKey(currentChar + String.valueOf(Document.peek(1)))){
             processedString += currentChar;
+            position++;
             currentChar = Document.getChar();
             processedString += currentChar;
+            position++;
             return new Token(twoCharExp.get(processedString), line, position);
         }
         else if(currentChar == '&' && Document.peek(1) != '&'){
@@ -209,10 +215,18 @@ public class Lexer {
      */
     private Token handleStringLiteral() throws Exception{
         qCount++;
-        while(currentChar != '"'){
+        currentChar = Document.getChar();
+        while(qCount == 1){
             processedString += currentChar;
             currentChar = Document.getChar();
             position++;
+            if(currentChar == '"'){
+                qCount++;
+                break;
+            }
+            else if(Document.isDone() || currentChar == '\n'){
+                break;
+            }
         }
         if (qCount % 2 != 0) throw new Exception("Unfinished quote");
         return new Token(Token.TokenType.STRINGLITERAL, processedString);
