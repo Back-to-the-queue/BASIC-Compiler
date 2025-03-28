@@ -179,7 +179,7 @@ public class Lexer {
                 position++;
             } else if(Document.isDone()){
                 break;
-            }
+            }if(oneCharExp.containsKey(String.valueOf(Document.peek(1)))) break;
             currentChar = Document.getChar();
         }
         return new Token(Token.TokenType.NUMBER, processedString);

@@ -7,7 +7,6 @@ public class CodeHandler {
     public CodeHandler(String document){
         this.document = document;
     }
-
     /**
      * peeks ahead in the document and returns a character
      * @param i the amount of characters to peek ahead

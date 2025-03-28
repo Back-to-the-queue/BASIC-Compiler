@@ -1,0 +1,28 @@
+REM This is a test program for the parser
+DIM A(10)
+LET X = 5
+LET Y = 10
+
+FOR I = 1 TO 5
+    PRINT "Loop iteration: "; I
+    READ A(I)
+NEXT I
+
+WHILE X < Y
+    PRINT "X is less than Y"
+    X = X + 1
+WEND
+
+IF X = Y THEN
+    PRINT "X equals Y"
+ELSE
+    PRINT "X does not equal Y"
+ENDIF
+
+GOSUB SubRoutine
+PRINT "Back from subroutine"
+END
+
+SubRoutine:
+PRINT "Inside subroutine"
+RETURN

@@ -4,7 +4,6 @@ import BASIC.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
-
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -18,7 +17,7 @@ public class LexerTest {
 
     @BeforeEach
     public void setUp() {
-        // Clear the token list before each test to prevent contamination between tests
+        //Clears the token list before each test to prevent contamination between tests
         Lexer.tokenList.clear();
     }
 
@@ -98,10 +97,8 @@ public class LexerTest {
     }
     @Test
     public void testFullProgram() throws Exception {
-        // Read the full test program from a file
-        String testInput = readTestFile("/Users/nicolasquesada/Documents/BASICpt2/src/BASIC_Test/Lexer/FullProgramTest");
-
-        // Create lexer and process the input
+        //Read the full test program from a file
+        String testInput = readTestFile("/Users/nicolasquesada/Documents/BASICpt2/src/BASIC_Test/Lexer/LexerFullProgramTest");
         Lexer lexer = new Lexer(testInput);
         lexer.lex();
         LinkedList<Token> tokens = Lexer.tokenList;
@@ -123,9 +120,9 @@ public class LexerTest {
         assertTrue(foundClosingBrace, "Program should contain a closing brace '}'.");
 
         //Prints all tokens
-        System.out.println("Tokens from FullProgramTest:");
+        System.out.println("Tokens from LexerFullProgramTest:");
         for (Token token : tokens) {
-            System.out.print(token + " ");
+            System.out.println(token);
         }
     }
 
