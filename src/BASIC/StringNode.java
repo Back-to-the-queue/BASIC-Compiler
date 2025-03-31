@@ -30,5 +30,5 @@ public class StringNode extends Node {
      * @return
      */
     @Override
-    public String toString() {return "STRING" + member;}
+    public String toString() {return "STRING(" + member + ")";}
 }

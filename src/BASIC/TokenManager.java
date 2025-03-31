@@ -31,7 +31,7 @@ public class TokenManager {
      * @return
      */
     public Optional<Token.TokenType> peek(int tokenNum){
-        if (tokenNum <= tokens.size()) {
+        if (tokenNum < tokens.size()) {
             Token.TokenType token = tokens.get(tokenNum).getTokenValue();
             return Optional.ofNullable(token);
         }

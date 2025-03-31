@@ -5,8 +5,8 @@ import java.util.List;
 
 public class PrintNode extends StatementNode{
     private List<Node> printList = new ArrayList<>(); //Holds a list of all that needs to be printed
-    public PrintNode(Node s){
-        printList.add(s);
+    public PrintNode(List<Node> s){
+        this.printList = s;
     }
 
     /**
@@ -26,5 +26,5 @@ public class PrintNode extends StatementNode{
      * @return the string value of the node
      */
     @Override
-    public String toString() {return "PRINT" + printList;}
+    public String toString() {return "PRINT(" + printList + ")";}
 }

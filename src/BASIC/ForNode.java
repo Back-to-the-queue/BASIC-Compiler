@@ -5,25 +5,21 @@ import java.util.List;
 import java.util.Optional;
 
 public class ForNode extends StatementNode{
-    public VariableNode getVariable() {return variable;}
+    public Optional<StatementNode> getVariable() {return variable;}
 
-    private VariableNode variable;
-
-    public Node getStart() {return start;}
-
-    private Node start;
+    private final Optional<StatementNode> variable;
 
     public Node getEnd() {return end;}
 
-    private Node end;
+    private final Node end;
 
-    public Optional<Node> getIncrement() {return increment;}
+    public Node getIncrement() {return increment;}
 
-    private Optional<Node> increment;
+    private Node increment;
 
     public List<StatementNode> getStatements() {return statements;}
 
-    private List<StatementNode> statements = new ArrayList<StatementNode>();
+    private final List<StatementNode> statements = new ArrayList<StatementNode>();
 
     /**
      * This constructor holds a for loop
@@ -32,15 +28,11 @@ public class ForNode extends StatementNode{
      * @param end the ending integer value
      * @param statement the statement within the for loop
      */
-    public ForNode(VariableNode reference, Node start, Node end, Optional<StatementNode> statement) {
+    public ForNode(Optional<StatementNode> reference,Node end, Node increment, Optional<StatementNode> statement) {
         this.variable = reference;
-        this.start = start;
         this.end = end;
-    }
-    public ForNode(VariableNode reference, Node start, Node end, Optional<Node> increment, Optional<StatementNode> statement) {
-        this.variable = reference;
-        this.start = start;
-        this.end = end;
+        this.increment = increment;
+        this.statements.add(statement.get());
     }
 
     @Override

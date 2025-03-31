@@ -4,40 +4,14 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="2e31ac94-7641-4d32-a053-5e01dcd9a4f9" name="Changes" comment="Implemented Lexer.processSymbol() and added a new token type for '&amp;' corner case in Lexer.lex()">
-      <change afterPath="$PROJECT_DIR$/src/BASIC/AssignmentNode.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/BASIC/BooleanExpression.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/BASIC/DataNode.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/BASIC/EndNode.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/BASIC/FloatNode.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/BASIC/ForNode.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/BASIC/FunctionNode.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/BASIC/GoSubNode.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/BASIC/IfNode.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/BASIC/InputNode.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/BASIC/IntegerNode.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/BASIC/LabeledStatementNode.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/BASIC/MathOpNode.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/BASIC/Node.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/BASIC/Parser.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/BASIC/PrintNode.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/BASIC/ReadNode.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/BASIC/ReturnNode.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/BASIC/StatementNode.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/BASIC/StatementsNode.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/BASIC/StringNode.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/BASIC/TokenManager.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/BASIC/VariableNode.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/BASIC/WhileNode.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/BASIC_Test/Parser/ParserTest.java" afterDir="false" />
+    <list default="true" id="2e31ac94-7641-4d32-a053-5e01dcd9a4f9" name="Changes" comment="Fixed issues with expression, term, factor, and several statements. Still working on print.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/BASIC/CodeHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/BASIC/CodeHandler.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/BASIC/Lexer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/BASIC/Lexer.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/BASIC_Test/Lexer/FullProgramTest" beforeDir="false" afterPath="$PROJECT_DIR$/src/BASIC_Test/Lexer/LexerFullProgramTest" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/BASIC_Test/Lexer/LexerTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/BASIC_Test/Lexer/LexerTest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/BASIC_Test/Lexer/ProcessStringLiteralTest" beforeDir="false" afterPath="$PROJECT_DIR$/src/BASIC_Test/Parser/ParserFullProgramTest" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/BASIC_Test/Lexer/ProcessSymbolTest" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/BASIC_Test/Lexer/ProcessWordTest" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/BASIC/AssignmentNode.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/BASIC/AssignmentNode.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/BASIC/ForNode.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/BASIC/ForNode.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/BASIC/Parser.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/BASIC/Parser.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/BASIC/PrintNode.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/BASIC/PrintNode.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/BASIC/StringNode.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/BASIC/StringNode.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/BASIC/TokenManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/BASIC/TokenManager.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -58,6 +32,9 @@
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="CurrentFile" />
   </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 0
@@ -80,6 +57,7 @@
     "JUnit.ParserTest.TestGosubReturn.executor": "Run",
     "JUnit.ParserTest.TestPrint.executor": "Run",
     "JUnit.ParserTest.executor": "Run",
+    "JUnit.ParserTest.testFullProgram.executor": "Run",
     "Repository.Attach.Annotations": "false",
     "Repository.Attach.JavaDocs": "false",
     "Repository.Attach.Sources": "false",
@@ -108,22 +86,7 @@
       <recent name="$PROJECT_DIR$/src/BASIC_Test/Lexer" />
     </key>
   </component>
-  <component name="RunManager" selected="JUnit.ParserTest.TestPrint">
-    <configuration name="LexerTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
-      <module name="BASICpt2" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="BASIC_Test.Lexer.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <option name="PACKAGE_NAME" value="BASIC_Test.Lexer" />
-      <option name="MAIN_CLASS_NAME" value="BASIC_Test.Lexer.LexerTest" />
-      <option name="TEST_OBJECT" value="class" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
+  <component name="RunManager" selected="JUnit.ParserTest.testFullProgram">
     <configuration name="ParserTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="BASICpt2" />
       <extension name="coverage">
@@ -187,13 +150,29 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
+    <configuration name="ParserTest.testFullProgram" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="BASICpt2" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="BASIC_Test.Parser.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="BASIC_Test.Parser" />
+      <option name="MAIN_CLASS_NAME" value="BASIC_Test.Parser.ParserTest" />
+      <option name="METHOD_NAME" value="testFullProgram" />
+      <option name="TEST_OBJECT" value="method" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="JUnit.ParserTest.testFullProgram" />
         <item itemvalue="JUnit.ParserTest.TestPrint" />
         <item itemvalue="JUnit.ParserTest.TestDataRead" />
         <item itemvalue="JUnit.ParserTest.TestGosubReturn" />
         <item itemvalue="JUnit.ParserTest" />
-        <item itemvalue="JUnit.LexerTest" />
       </list>
     </recent_temporary>
   </component>
@@ -219,7 +198,7 @@
       <workItem from="1739485896864" duration="12232000" />
       <workItem from="1739892782578" duration="4858000" />
       <workItem from="1741017428906" duration="6486000" />
-      <workItem from="1742347147415" duration="12789000" />
+      <workItem from="1742347147415" duration="20506000" />
     </task>
     <task id="LOCAL-00001" summary="Started Building the Lexer and corresponding JUNIT tests">
       <option name="closed" value="true" />
@@ -277,7 +256,15 @@
       <option name="project" value="LOCAL" />
       <updated>1739891589892</updated>
     </task>
-    <option name="localTasksCounter" value="8" />
+    <task id="LOCAL-00008" summary="Fixed issues with expression, term, factor, and several statements. Still working on print.">
+      <option name="closed" value="true" />
+      <created>1743181831889</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1743181831889</updated>
+    </task>
+    <option name="localTasksCounter" value="9" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -319,7 +306,7 @@
                   <entry key="branch">
                     <value>
                       <list>
-                        <option value="HEAD" />
+                        <option value="Testing" />
                       </list>
                     </value>
                   </entry>
@@ -337,7 +324,8 @@
     <MESSAGE value="Implemented ProcessNumber() and HandleStringLiteral()" />
     <MESSAGE value="Implemented function recognition in Lexer.processWord() and fixed issue in CodeHandler.peek(i)" />
     <MESSAGE value="Implemented Lexer.processSymbol() and added a new token type for '&amp;' corner case in Lexer.lex()" />
-    <option name="LAST_COMMIT_MESSAGE" value="Implemented Lexer.processSymbol() and added a new token type for '&amp;' corner case in Lexer.lex()" />
+    <MESSAGE value="Fixed issues with expression, term, factor, and several statements. Still working on print." />
+    <option name="LAST_COMMIT_MESSAGE" value="Fixed issues with expression, term, factor, and several statements. Still working on print." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -371,7 +359,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-method">
           <url>file://$PROJECT_DIR$/src/BASIC/Parser.java</url>
-          <line>131</line>
+          <line>128</line>
           <properties class="BASIC.Parser">
             <option name="EMULATED" value="true" />
             <option name="WATCH_EXIT" value="false" />
@@ -380,7 +368,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-method">
           <url>file://$PROJECT_DIR$/src/BASIC/Parser.java</url>
-          <line>190</line>
+          <line>186</line>
           <properties class="BASIC.Parser" method="statements">
             <option name="EMULATED" value="true" />
             <option name="WATCH_EXIT" value="false" />
@@ -398,7 +386,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-method">
           <url>file://$PROJECT_DIR$/src/BASIC/Parser.java</url>
-          <line>524</line>
+          <line>531</line>
           <properties class="BASIC.Parser" method="acceptSeparators">
             <option name="EMULATED" value="true" />
             <option name="WATCH_EXIT" value="false" />
@@ -434,25 +422,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-method">
           <url>file://$PROJECT_DIR$/src/BASIC/Parser.java</url>
-          <line>339</line>
-          <properties class="BASIC.Parser" method="returnStatement">
-            <option name="EMULATED" value="true" />
-            <option name="WATCH_EXIT" value="false" />
-          </properties>
-          <option name="timeStamp" value="728" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-method">
-          <url>file://$PROJECT_DIR$/src/BASIC/Parser.java</url>
-          <line>400</line>
-          <properties class="BASIC.Parser" method="goSubStatement">
-            <option name="EMULATED" value="true" />
-            <option name="WATCH_EXIT" value="false" />
-          </properties>
-          <option name="timeStamp" value="733" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-method">
-          <url>file://$PROJECT_DIR$/src/BASIC/Parser.java</url>
-          <line>208</line>
+          <line>204</line>
           <properties class="BASIC.Parser" method="printStatement">
             <option name="EMULATED" value="true" />
             <option name="WATCH_EXIT" value="false" />
@@ -461,7 +431,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-method">
           <url>file://$PROJECT_DIR$/src/BASIC/Parser.java</url>
-          <line>220</line>
+          <line>214</line>
           <properties class="BASIC.Parser" method="printList">
             <option name="EMULATED" value="true" />
             <option name="WATCH_EXIT" value="false" />
@@ -480,22 +450,22 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/BASIC/Parser.java</url>
-          <line>134</line>
+          <line>131</line>
           <option name="timeStamp" value="347" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/BASIC/Parser.java</url>
-          <line>136</line>
+          <line>133</line>
           <option name="timeStamp" value="348" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/BASIC/Parser.java</url>
-          <line>132</line>
+          <line>129</line>
           <option name="timeStamp" value="349" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/BASIC/Parser.java</url>
-          <line>138</line>
+          <line>135</line>
           <properties>
             <option name="lambda-ordinal" value="-1" />
           </properties>
@@ -503,32 +473,32 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/BASIC/Parser.java</url>
-          <line>137</line>
+          <line>134</line>
           <option name="timeStamp" value="352" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/BASIC/Parser.java</url>
-          <line>192</line>
+          <line>188</line>
           <option name="timeStamp" value="441" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/BASIC/Parser.java</url>
-          <line>197</line>
+          <line>193</line>
           <option name="timeStamp" value="444" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/BASIC/Parser.java</url>
-          <line>199</line>
+          <line>195</line>
           <option name="timeStamp" value="445" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/BASIC/Parser.java</url>
-          <line>200</line>
+          <line>196</line>
           <option name="timeStamp" value="446" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/BASIC/Parser.java</url>
-          <line>201</line>
+          <line>197</line>
           <option name="timeStamp" value="447" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
@@ -568,12 +538,12 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/BASIC/Parser.java</url>
-          <line>525</line>
+          <line>532</line>
           <option name="timeStamp" value="598" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/BASIC/Parser.java</url>
-          <line>527</line>
+          <line>534</line>
           <option name="timeStamp" value="600" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
@@ -583,22 +553,22 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/BASIC/Parser.java</url>
-          <line>193</line>
+          <line>189</line>
           <option name="timeStamp" value="609" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/BASIC/Parser.java</url>
-          <line>194</line>
+          <line>190</line>
           <option name="timeStamp" value="610" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/BASIC/Parser.java</url>
-          <line>195</line>
+          <line>191</line>
           <option name="timeStamp" value="611" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/BASIC/Parser.java</url>
-          <line>196</line>
+          <line>192</line>
           <option name="timeStamp" value="612" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
@@ -768,92 +738,22 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/BASIC/Parser.java</url>
-          <line>108</line>
-          <option name="timeStamp" value="665" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/BASIC/Parser.java</url>
-          <line>109</line>
-          <option name="timeStamp" value="666" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/BASIC/Parser.java</url>
-          <line>110</line>
-          <option name="timeStamp" value="667" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/BASIC/Parser.java</url>
-          <line>111</line>
-          <option name="timeStamp" value="668" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/BASIC/Parser.java</url>
-          <line>112</line>
-          <option name="timeStamp" value="669" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/BASIC/Parser.java</url>
-          <line>113</line>
-          <option name="timeStamp" value="670" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/BASIC/Parser.java</url>
-          <line>114</line>
-          <option name="timeStamp" value="671" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/BASIC/Parser.java</url>
-          <line>115</line>
-          <option name="timeStamp" value="672" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/BASIC/Parser.java</url>
-          <line>117</line>
-          <option name="timeStamp" value="673" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/BASIC/Parser.java</url>
-          <line>116</line>
-          <option name="timeStamp" value="674" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/BASIC/Parser.java</url>
-          <line>118</line>
-          <option name="timeStamp" value="675" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/BASIC/Parser.java</url>
           <line>120</line>
-          <option name="timeStamp" value="676" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/BASIC/Parser.java</url>
-          <line>121</line>
-          <option name="timeStamp" value="677" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/BASIC/Parser.java</url>
-          <line>123</line>
           <option name="timeStamp" value="678" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/BASIC/Parser.java</url>
-          <line>122</line>
-          <option name="timeStamp" value="679" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/BASIC/Parser.java</url>
-          <line>133</line>
+          <line>130</line>
           <option name="timeStamp" value="680" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/BASIC/Parser.java</url>
-          <line>135</line>
+          <line>132</line>
           <option name="timeStamp" value="681" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/BASIC/Parser.java</url>
-          <line>139</line>
+          <line>136</line>
           <properties>
             <option name="lambda-ordinal" value="-1" />
           </properties>
@@ -861,303 +761,237 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/BASIC/Parser.java</url>
-          <line>140</line>
+          <line>137</line>
           <option name="timeStamp" value="683" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/BASIC/Parser.java</url>
-          <line>141</line>
+          <line>138</line>
           <option name="timeStamp" value="684" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/BASIC/Parser.java</url>
-          <line>142</line>
+          <line>139</line>
           <option name="timeStamp" value="685" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/BASIC/Parser.java</url>
-          <line>143</line>
+          <line>140</line>
           <option name="timeStamp" value="686" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/BASIC/Parser.java</url>
-          <line>144</line>
+          <line>141</line>
           <option name="timeStamp" value="687" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/BASIC/Parser.java</url>
-          <line>145</line>
+          <line>142</line>
           <option name="timeStamp" value="688" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/BASIC/Parser.java</url>
-          <line>147</line>
+          <line>143</line>
           <option name="timeStamp" value="689" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/BASIC/Parser.java</url>
-          <line>148</line>
+          <line>144</line>
           <option name="timeStamp" value="690" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/BASIC/Parser.java</url>
-          <line>150</line>
+          <line>146</line>
           <option name="timeStamp" value="691" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/BASIC/Parser.java</url>
-          <line>149</line>
+          <line>145</line>
           <option name="timeStamp" value="692" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/BASIC/Parser.java</url>
-          <line>151</line>
+          <line>147</line>
           <option name="timeStamp" value="693" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/BASIC/Parser.java</url>
-          <line>152</line>
+          <line>148</line>
           <option name="timeStamp" value="694" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/BASIC/Parser.java</url>
-          <line>153</line>
+          <line>149</line>
           <option name="timeStamp" value="695" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/BASIC/Parser.java</url>
-          <line>155</line>
+          <line>151</line>
           <option name="timeStamp" value="696" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/BASIC/Parser.java</url>
-          <line>154</line>
+          <line>150</line>
           <option name="timeStamp" value="697" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/BASIC/Parser.java</url>
-          <line>156</line>
+          <line>152</line>
           <option name="timeStamp" value="698" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/BASIC/Parser.java</url>
-          <line>158</line>
+          <line>154</line>
           <option name="timeStamp" value="699" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/BASIC/Parser.java</url>
-          <line>157</line>
+          <line>153</line>
           <option name="timeStamp" value="700" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/BASIC/Parser.java</url>
-          <line>159</line>
+          <line>155</line>
           <option name="timeStamp" value="701" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/BASIC/Parser.java</url>
-          <line>160</line>
+          <line>156</line>
           <option name="timeStamp" value="702" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/BASIC/Parser.java</url>
-          <line>161</line>
+          <line>157</line>
           <option name="timeStamp" value="703" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/BASIC/Parser.java</url>
-          <line>163</line>
+          <line>159</line>
           <option name="timeStamp" value="704" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/BASIC/Parser.java</url>
-          <line>164</line>
+          <line>160</line>
           <option name="timeStamp" value="705" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/BASIC/Parser.java</url>
-          <line>166</line>
+          <line>162</line>
           <option name="timeStamp" value="706" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/BASIC/Parser.java</url>
-          <line>167</line>
+          <line>163</line>
           <option name="timeStamp" value="707" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/BASIC/Parser.java</url>
-          <line>168</line>
+          <line>164</line>
           <option name="timeStamp" value="709" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/BASIC/Parser.java</url>
-          <line>170</line>
+          <line>166</line>
           <option name="timeStamp" value="710" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/BASIC/Parser.java</url>
-          <line>169</line>
+          <line>165</line>
           <option name="timeStamp" value="711" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/BASIC/Parser.java</url>
-          <line>172</line>
+          <line>168</line>
           <option name="timeStamp" value="712" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/BASIC/Parser.java</url>
-          <line>171</line>
+          <line>167</line>
           <option name="timeStamp" value="713" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/BASIC/Parser.java</url>
-          <line>173</line>
+          <line>169</line>
           <option name="timeStamp" value="714" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/BASIC/Parser.java</url>
-          <line>174</line>
+          <line>170</line>
           <option name="timeStamp" value="715" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/BASIC/Parser.java</url>
-          <line>175</line>
+          <line>171</line>
           <option name="timeStamp" value="716" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/BASIC/Parser.java</url>
-          <line>177</line>
+          <line>173</line>
           <option name="timeStamp" value="717" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/BASIC/Parser.java</url>
-          <line>176</line>
+          <line>172</line>
           <option name="timeStamp" value="718" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/BASIC/Parser.java</url>
-          <line>178</line>
+          <line>174</line>
           <option name="timeStamp" value="719" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/BASIC/Parser.java</url>
-          <line>179</line>
+          <line>175</line>
           <option name="timeStamp" value="720" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/BASIC/Parser.java</url>
-          <line>180</line>
+          <line>176</line>
           <option name="timeStamp" value="721" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/BASIC/Parser.java</url>
-          <line>182</line>
+          <line>178</line>
           <option name="timeStamp" value="722" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/BASIC/Parser.java</url>
-          <line>181</line>
+          <line>177</line>
           <option name="timeStamp" value="723" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/BASIC/Parser.java</url>
-          <line>183</line>
+          <line>179</line>
           <option name="timeStamp" value="724" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/BASIC/Parser.java</url>
-          <line>191</line>
+          <line>187</line>
           <option name="timeStamp" value="725" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/BASIC/Parser.java</url>
-          <line>340</line>
-          <option name="timeStamp" value="729" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/BASIC/Parser.java</url>
-          <line>342</line>
-          <properties>
-            <option name="lambda-ordinal" value="-1" />
-          </properties>
-          <option name="timeStamp" value="730" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/BASIC/Parser.java</url>
-          <line>341</line>
-          <option name="timeStamp" value="731" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/BASIC/Parser.java</url>
-          <line>526</line>
+          <line>533</line>
           <option name="timeStamp" value="732" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/BASIC/Parser.java</url>
-          <line>402</line>
-          <option name="timeStamp" value="735" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/BASIC/Parser.java</url>
-          <line>401</line>
-          <option name="timeStamp" value="736" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/BASIC/Parser.java</url>
-          <line>403</line>
-          <option name="timeStamp" value="737" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/BASIC/Parser.java</url>
-          <line>404</line>
-          <option name="timeStamp" value="738" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/BASIC/Parser.java</url>
-          <line>406</line>
-          <option name="timeStamp" value="739" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/BASIC/Parser.java</url>
-          <line>407</line>
-          <properties>
-            <option name="lambda-ordinal" value="-1" />
-          </properties>
-          <option name="timeStamp" value="740" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/BASIC/Parser.java</url>
-          <line>408</line>
-          <option name="timeStamp" value="741" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/BASIC/Parser.java</url>
-          <line>409</line>
-          <option name="timeStamp" value="742" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/BASIC/Parser.java</url>
-          <line>210</line>
-          <option name="timeStamp" value="744" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/BASIC/Parser.java</url>
-          <line>209</line>
+          <line>205</line>
           <option name="timeStamp" value="745" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/BASIC/Parser.java</url>
-          <line>212</line>
+          <line>207</line>
           <option name="timeStamp" value="746" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/BASIC/Parser.java</url>
-          <line>213</line>
+          <line>208</line>
           <option name="timeStamp" value="747" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/BASIC/Parser.java</url>
-          <line>214</line>
+          <line>209</line>
           <properties>
             <option name="lambda-ordinal" value="-1" />
           </properties>
@@ -1165,23 +999,18 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/BASIC/Parser.java</url>
-          <line>215</line>
+          <line>210</line>
           <option name="timeStamp" value="749" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/BASIC/Parser.java</url>
-          <line>221</line>
+          <line>216</line>
           <option name="timeStamp" value="751" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/BASIC/Parser.java</url>
-          <line>244</line>
+          <line>235</line>
           <option name="timeStamp" value="759" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/BASIC/Parser.java</url>
-          <line>405</line>
-          <option name="timeStamp" value="761" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/BASIC/Parser.java</url>
@@ -1290,8 +1119,68 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/BASIC/Parser.java</url>
-          <line>211</line>
-          <option name="timeStamp" value="784" />
+          <line>217</line>
+          <option name="timeStamp" value="795" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/BASIC/Parser.java</url>
+          <line>218</line>
+          <option name="timeStamp" value="796" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/BASIC/Parser.java</url>
+          <line>220</line>
+          <option name="timeStamp" value="797" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/BASIC/Parser.java</url>
+          <line>219</line>
+          <option name="timeStamp" value="798" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/BASIC/Parser.java</url>
+          <line>222</line>
+          <option name="timeStamp" value="799" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/BASIC/Parser.java</url>
+          <line>221</line>
+          <option name="timeStamp" value="800" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/BASIC/Parser.java</url>
+          <line>229</line>
+          <option name="timeStamp" value="810" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/BASIC/Parser.java</url>
+          <line>228</line>
+          <option name="timeStamp" value="811" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/BASIC/Parser.java</url>
+          <line>230</line>
+          <option name="timeStamp" value="812" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/BASIC/Parser.java</url>
+          <line>231</line>
+          <option name="timeStamp" value="813" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/BASIC/Parser.java</url>
+          <line>232</line>
+          <option name="timeStamp" value="814" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/BASIC/Parser.java</url>
+          <line>234</line>
+          <option name="timeStamp" value="815" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/BASIC/Parser.java</url>
+          <line>233</line>
+          <option name="timeStamp" value="816" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
