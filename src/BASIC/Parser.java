@@ -371,31 +371,10 @@ public class Parser {
         }else throw new Exception("Start range not found");
         Optional<StatementNode> state = statement();
         if(tokenM.matchAndRemove(Token.TokenType.NEXT).equals(Optional.of(Token.TokenType.NEXT))){
-            if(step)
+                Node last = expression();
+                tokenM.matchAndRemove(Token.TokenType.WORD);
                 return Optional.of(new ForNode(variable,new IntegerNode(end), new IntegerNode(increment), state));
         }
-            /*varName = token.get(0).getValue();
-            tokenM.matchAndRemove(Token.TokenType.WORD);
-            if (tokenM.matchAndRemove(Token.TokenType.EQUAL).equals(Optional.of(Token.TokenType.EQUAL))) {
-                start = Integer.parseInt(token.get(0).getValue());
-                tokenM.matchAndRemove(Token.TokenType.NUMBER);
-                if (tokenM.matchAndRemove(Token.TokenType.TO).equals(Optional.of(Token.TokenType.TO))) {
-                    end = Integer.parseInt(token.get(0).getValue());
-                    tokenM.matchAndRemove(Token.TokenType.NUMBER);
-                    if (tokenM.matchAndRemove(Token.TokenType.STEP).equals(Optional.of(Token.TokenType.STEP))) {
-                        step = true;
-                        increment = Integer.parseInt(token.get(0).getValue());
-                        tokenM.matchAndRemove(Token.TokenType.NUMBER);
-                    }
-                } else throw new Exception("End range not found");
-            } else throw new Exception("Start range not found");
-            Optional<StatementNode> state = statement();
-            if (tokenM.matchAndRemove(Token.TokenType.NEXT).equals(Optional.of(Token.TokenType.NEXT))) {
-                if (step)
-                    return Optional.of(new ForNode(new VariableNode(varName), new IntegerNode(start), new IntegerNode(end), Optional.of(new IntegerNode(increment)), state));
-                return Optional.of(new ForNode(new VariableNode(varName), new IntegerNode(start), new IntegerNode(end), state));
-            }
-        } else return Optional.empty();*/
         return Optional.empty();
     }
 
@@ -423,22 +402,24 @@ public class Parser {
      * @throws Exception if not implemented correctly
      */
     private Optional<StatementNode> ifStatement() throws Exception {
-        /*String currState = "";
+        StatementsNode state = new StatementsNode();
+        LabeledStatementNode isLabel = new LabeledStatementNode();
         if (tokenM.matchAndRemove(Token.TokenType.IF).equals(Optional.of(Token.TokenType.IF))) {
             Optional<StatementNode> condition = parseBoolean();
-            StatementsNode state = new StatementsNode();
             if (condition.isPresent()) {
                 if (!(tokenM.matchAndRemove(Token.TokenType.THEN).equals(Optional.of(Token.TokenType.THEN))))
-                    throw new Exception("Expected Separator");
+                    throw new Exception("Expected THEN block");
                 String label = token.get(0).getValue();
-                //List<Optional<StatementNode>> labelCheck = state.getStatements();
-                for (var i : labelCheck)
-                    currState = state.getCurrentStatement().toString();
-                if (currState.substring(0, currState.length() - 1).equals(label)) {
-                    return Optional.of(new IfNode(condition, label));
-                } else throw new Exception("Label does not exist");
-            } else throw new Exception("Condition not found");
-        } else return Optional.empty();*/
+                List<Optional<StatementNode>> labelCheck = state.getStatements();
+                for (Optional<StatementNode> statementNode : labelCheck) {
+                    if(statementNode.equals(isLabel.getStatement())) {
+                        if(String.valueOf(statementNode).contains(label)){
+                            return Optional.of(new IfNode(condition, label));
+                        }else throw new Exception("Label does not exist");
+                    }else throw new Exception("Condition not found");
+                }
+            } else throw new Exception("Boolean does not exist");
+        } else throw new Exception("If block not found");
         return Optional.empty();
     }
 
@@ -449,29 +430,27 @@ public class Parser {
      * @throws Exception if not implemented correctly
      */
     private Optional<StatementNode> whileStatement() throws Exception {
-        /*String endLabel = "";
+        String endLabel = "";
         String currState = "";
         if (tokenM.matchAndRemove(Token.TokenType.WHILE).equals(Optional.of(Token.TokenType.WHILE))) {
             StatementsNode state = new StatementsNode();
             Optional<StatementNode> condition = parseBoolean();
-            Optional<StatementNode> label = Optional.empty();
+            StatementNode label;
             if (condition.isPresent()) {
-                if (tokenM.peek(1).equals(Optional.of(Token.TokenType.WORD))) {
+                if (tokenM.peek(0).equals(Optional.of(Token.TokenType.WORD))) {
                     endLabel = token.get(0).getValue();
                     tokenM.matchAndRemove(Token.TokenType.WORD);
                 }
                 Optional<StatementNode> loopState = statement();
-                if (tokenM.peek(1).equals(Optional.of(Token.TokenType.LABEL))) {
-                    label = statement();
-                }
-                //List<Optional<StatementNode>> labelCheck = state.getStatements();
-                for (var i : labelCheck)
-                    currState = state.getCurrentStatement().toString();
-                if (currState.substring(0, currState.length() - 1).equals(endLabel)) {
-                    return Optional.of(new WhileNode(condition, loopState, label));
-                } else throw new Exception("Label does not exist");
-            } else throw new Exception("Condition not found");
-        } else return Optional.empty();*/ return Optional.empty();
+                if (tokenM.peek(0).equals(Optional.of(Token.TokenType.LABEL))) {
+                    label = statements();
+                    if(String.valueOf(label).contains(endLabel)){
+                        return Optional.of(new WhileNode(condition, loopState, Optional.ofNullable(label)));
+                    } else throw new Exception("Label does not exist");
+                } else throw new Exception("Condition not found");
+            }
+        }
+        return Optional.empty();
     }
 
     /**

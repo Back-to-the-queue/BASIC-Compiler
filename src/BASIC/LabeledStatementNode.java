@@ -7,6 +7,7 @@ public class LabeledStatementNode extends StatementNode{
 
     private Optional<StatementNode> statement;
 
+    public LabeledStatementNode(){}
     public LabeledStatementNode(String label, Optional<StatementNode> state){
         this.label = label;
         this.statement = state;

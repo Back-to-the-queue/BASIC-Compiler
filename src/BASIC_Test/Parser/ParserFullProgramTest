@@ -1,28 +1,37 @@
-REM This is a test program for the parser
-DIM A(10)
-LET X = 5
-LET Y = 10
+F = 100
+GOSUB FtoC
+PRINT "Temperature in Celsius:", C
 
-FOR I = 1 TO 5
-    PRINT "Loop iteration: "; I
-    READ A(I)
-NEXT I
+IF C < 40 THEN printCold
 
-WHILE X < Y
-    PRINT "X is less than Y"
-    X = X + 1
-WEND
+PRINT "Counting from 1 to 5:"
+FOR X = 1 TO 5
+    PRINT X
+NEXT X
 
-IF X = Y THEN
-    PRINT "X equals Y"
-ELSE
-    PRINT "X does not equal Y"
-ENDIF
+WHILE Y < 3 endWhileLabel
+    PRINT "Y is", Y
+    Y = Y + 1
+endWhileLabel:
 
-GOSUB SubRoutine
-PRINT "Back from subroutine"
-END
+name$ = "BASIC Compiler"
+PRINT "Left 5 chars:", LEFT$(name$, 5)
+PRINT "Right 4 chars:", RIGHT$(name$, 4)
+PRINT "Middle part:", MID$(name$, 2, 3)
 
-SubRoutine:
-PRINT "Inside subroutine"
-RETURN
+PRINT "Random number:", RANDOM()
+
+DATA 42, "Hello BASIC"
+READ num, greeting$
+PRINT "Read from DATA:", num, greeting$
+
+INPUT "Enter your name and age:", userName$, userAge
+PRINT "Hi", userName$, "you are", userAge, "years old!"
+
+FtoC:
+    C = 5 * (F - 32) / 9
+    RETURN
+
+printCold:
+    PRINT "It's cold!"
+    END

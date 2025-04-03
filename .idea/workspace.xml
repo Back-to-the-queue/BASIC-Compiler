@@ -4,14 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="2e31ac94-7641-4d32-a053-5e01dcd9a4f9" name="Changes" comment="Fixed issues with expression, term, factor, and several statements. Still working on print.">
+    <list default="true" id="2e31ac94-7641-4d32-a053-5e01dcd9a4f9" name="Changes" comment="Fixed issues with for, print and printList. Still working on If and While.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/BASIC/AssignmentNode.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/BASIC/AssignmentNode.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/BASIC/ForNode.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/BASIC/ForNode.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/BASIC/LabeledStatementNode.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/BASIC/LabeledStatementNode.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/BASIC/Parser.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/BASIC/Parser.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/BASIC/PrintNode.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/BASIC/PrintNode.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/BASIC/StringNode.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/BASIC/StringNode.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/BASIC/TokenManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/BASIC/TokenManager.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/BASIC_Test/Parser/ParserFullProgramTest" beforeDir="false" afterPath="$PROJECT_DIR$/src/BASIC_Test/Parser/ParserFullProgramTest" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -198,7 +195,7 @@
       <workItem from="1739485896864" duration="12232000" />
       <workItem from="1739892782578" duration="4858000" />
       <workItem from="1741017428906" duration="6486000" />
-      <workItem from="1742347147415" duration="20506000" />
+      <workItem from="1742347147415" duration="27079000" />
     </task>
     <task id="LOCAL-00001" summary="Started Building the Lexer and corresponding JUNIT tests">
       <option name="closed" value="true" />
@@ -264,7 +261,15 @@
       <option name="project" value="LOCAL" />
       <updated>1743181831889</updated>
     </task>
-    <option name="localTasksCounter" value="9" />
+    <task id="LOCAL-00009" summary="Fixed issues with for, print and printList. Still working on If and While.">
+      <option name="closed" value="true" />
+      <created>1743446678296</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1743446678296</updated>
+    </task>
+    <option name="localTasksCounter" value="10" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -325,7 +330,8 @@
     <MESSAGE value="Implemented function recognition in Lexer.processWord() and fixed issue in CodeHandler.peek(i)" />
     <MESSAGE value="Implemented Lexer.processSymbol() and added a new token type for '&amp;' corner case in Lexer.lex()" />
     <MESSAGE value="Fixed issues with expression, term, factor, and several statements. Still working on print." />
-    <option name="LAST_COMMIT_MESSAGE" value="Fixed issues with expression, term, factor, and several statements. Still working on print." />
+    <MESSAGE value="Fixed issues with for, print and printList. Still working on If and While." />
+    <option name="LAST_COMMIT_MESSAGE" value="Fixed issues with for, print and printList. Still working on If and While." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -386,7 +392,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-method">
           <url>file://$PROJECT_DIR$/src/BASIC/Parser.java</url>
-          <line>531</line>
+          <line>510</line>
           <properties class="BASIC.Parser" method="acceptSeparators">
             <option name="EMULATED" value="true" />
             <option name="WATCH_EXIT" value="false" />
@@ -538,12 +544,12 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/BASIC/Parser.java</url>
-          <line>532</line>
+          <line>511</line>
           <option name="timeStamp" value="598" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/BASIC/Parser.java</url>
-          <line>534</line>
+          <line>513</line>
           <option name="timeStamp" value="600" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
@@ -971,7 +977,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/BASIC/Parser.java</url>
-          <line>533</line>
+          <line>512</line>
           <option name="timeStamp" value="732" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
