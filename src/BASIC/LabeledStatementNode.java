@@ -7,7 +7,7 @@ public class LabeledStatementNode extends StatementNode{
 
     private Optional<StatementNode> statement;
 
-    public LabeledStatementNode(){}
+    public LabeledStatementNode(String label){this.label = label;}
     public LabeledStatementNode(String label, Optional<StatementNode> state){
         this.label = label;
         this.statement = state;
@@ -18,8 +18,6 @@ public class LabeledStatementNode extends StatementNode{
 
 
     @Override
-    public String toString() {
-        return label + ": " + statement;
-    }
+    public String toString() {return "LabelNode[" + label + ": " + statement + "]";}
 }
 

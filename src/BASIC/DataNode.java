@@ -30,5 +30,5 @@ public class DataNode extends StatementNode{
      * @return the string value of the node
      */
     @Override
-    public String toString(){return "DATA" + data;}
+    public String toString(){return "DataNode" + data + "]";}
 }

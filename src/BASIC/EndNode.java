@@ -6,6 +6,6 @@ public class EndNode extends StatementNode{
 
     @Override
     public String toString() {
-        return null;
+        return "EndNode";
     }
 }

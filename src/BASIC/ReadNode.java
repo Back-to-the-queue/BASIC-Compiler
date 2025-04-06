@@ -31,5 +31,5 @@ public class ReadNode extends StatementNode{
      * @return the string value of the node
      */
     @Override
-    public String toString() {return "READ" + vars;}
+    public String toString() {return "ReadNode" + vars;}
 }

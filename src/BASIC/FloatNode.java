@@ -29,7 +29,7 @@ public class FloatNode extends Node {
      */
     @Override
     public String toString() {
-        return String.valueOf(number);
+        return "FloatNode[" + String.valueOf(number) + "]";
     }
 
 }

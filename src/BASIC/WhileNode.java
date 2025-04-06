@@ -22,6 +22,6 @@ public class WhileNode extends StatementNode{
 
     @Override
     public String toString() {
-        return null;
+        return "WhileNode[condition=" + condition + ", endLabel=" + endLabel + ", loopState=" + loopState + "]";
     }
 }

@@ -30,6 +30,6 @@ public class AssignmentNode extends StatementNode{
      */
     @Override
     public String toString() {
-        return "ASSIGNMENT(" + target.toString() + "," + expression.toString() + ")";
+        return "AssignmentNode[" + target.toString() + "," + expression.toString() + "]";
     }
 }

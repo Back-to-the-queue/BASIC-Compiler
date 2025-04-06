@@ -96,7 +96,7 @@ public class Parser {
 
     /**
      * @return a partial answer if parsing is incomplete
-     * @throws IllegalStateException
+     * @throws IllegalStateException When there are less tokes than expected or an unexpected token
      */
     private Node factor() throws Exception {
         Token.TokenType fToken = tokenM.peek(0).orElseThrow();
@@ -136,12 +136,14 @@ public class Parser {
         }
         if (!tokenM.moreTokens()) return Optional.empty();
         Token.TokenType sToken = token.get(0).getTokenValue();
+        //acceptSeparators();
         switch (sToken) {
             case PRINT:
                 state = printStatement();
                 break;
             case WORD:
-                if(tokenM.peek(1).isPresent() && tokenM.peek(1).equals(Optional.of(Token.TokenType.EQUAL))){
+                if(tokenM.peek(1).isPresent() &&
+                        (tokenM.peek(1).equals(Optional.of(Token.TokenType.EQUAL)))){
                     state = assignment();
                 }
                 break;
@@ -173,9 +175,17 @@ public class Parser {
             case GOSUB:
                 state = goSubStatement();
                 break;
+            case LEFT:
+            case RANDOM:
+            case NUM:
+            case VAL:
+            case RIGHT:
+                state = functionInvocation();
+                break;
             default:
                 throw new IllegalStateException("Unexpected statement type in statement");
         }
+        //acceptSeparators();
         return state;
     }
 
@@ -220,12 +230,16 @@ public class Parser {
                 break;
             }
             Token.TokenType print = pToken.get();
-            Node item;
-            if (print == Token.TokenType.STRINGLITERAL) {
-                item = new StringNode(token.get(0).getValue());
-                tokenM.matchAndRemove(Token.TokenType.STRINGLITERAL);
-            } else {
-                item = expression();
+            Node item = null;
+            switch(print){
+                case STRINGLITERAL:
+                    item = new StringNode(token.get(0).getValue());
+                    tokenM.matchAndRemove(Token.TokenType.STRINGLITERAL);
+                    break;
+                case WORD:
+                    item = expression();
+                    tokenM.matchAndRemove(Token.TokenType.WORD);
+                    break;
             }
             printList.add(item);
             if (tokenM.peek(0).isPresent() && tokenM.peek(0).get() != Token.TokenType.COMMA) {
@@ -244,9 +258,20 @@ public class Parser {
      */
     private Optional<StatementNode> assignment() throws Exception {
         var left = factor();
+        tokenM.matchAndRemove(Token.TokenType.WORD);
+        Node right;
+        Optional<Token.TokenType> aToken = tokenM.peek(0);
+        if (aToken.isEmpty()) return Optional.empty();
         var op = tokenM.matchAndRemove(Token.TokenType.EQUAL);
+        Token.TokenType print = token.get(0).getTokenValue();
         if (op.isPresent()) {
-            var right = expression();
+            if (print == Token.TokenType.STRINGLITERAL) {
+                right = new StringNode(token.get(0).getValue());
+                tokenM.matchAndRemove(Token.TokenType.STRINGLITERAL);
+            } else {
+                right = expression();
+                tokenM.matchAndRemove(Token.TokenType.WORD);
+            }
             return Optional.of(new AssignmentNode(left, right));
         } else {
             return Optional.empty();
@@ -356,22 +381,24 @@ public class Parser {
         Optional<StatementNode> variable;
         int end;
         int increment = 1;
-        boolean step = false;
         if (tokenM.matchAndRemove(Token.TokenType.FOR).equals(Optional.of(Token.TokenType.FOR))) {
             variable = assignment();
             if(tokenM.matchAndRemove(Token.TokenType.TO).equals(Optional.of(Token.TokenType.TO))) {
                 end = Integer.parseInt(token.get(0).getValue());
                 tokenM.matchAndRemove(Token.TokenType.NUMBER);
                 if (tokenM.matchAndRemove(Token.TokenType.STEP).equals(Optional.of(Token.TokenType.STEP))) {
-                    step = true;
                     increment = Integer.parseInt(token.get(0).getValue());
                     tokenM.matchAndRemove(Token.TokenType.NUMBER);
                 }
             }else throw new Exception("End range not found");
         }else throw new Exception("Start range not found");
+        acceptSeparators();
         Optional<StatementNode> state = statement();
+        acceptSeparators();
         if(tokenM.matchAndRemove(Token.TokenType.NEXT).equals(Optional.of(Token.TokenType.NEXT))){
                 Node last = expression();
+                if(!(variable.get().toString().contains(last.toString())))
+                    throw new Exception("Variable Not Found");
                 tokenM.matchAndRemove(Token.TokenType.WORD);
                 return Optional.of(new ForNode(variable,new IntegerNode(end), new IntegerNode(increment), state));
         }
@@ -403,20 +430,21 @@ public class Parser {
      */
     private Optional<StatementNode> ifStatement() throws Exception {
         StatementsNode state = new StatementsNode();
-        LabeledStatementNode isLabel = new LabeledStatementNode();
+        Optional<StatementNode> isLabel;
         if (tokenM.matchAndRemove(Token.TokenType.IF).equals(Optional.of(Token.TokenType.IF))) {
             Optional<StatementNode> condition = parseBoolean();
             if (condition.isPresent()) {
                 if (!(tokenM.matchAndRemove(Token.TokenType.THEN).equals(Optional.of(Token.TokenType.THEN))))
                     throw new Exception("Expected THEN block");
                 String label = token.get(0).getValue();
-                List<Optional<StatementNode>> labelCheck = state.getStatements();
-                for (Optional<StatementNode> statementNode : labelCheck) {
-                    if(statementNode.equals(isLabel.getStatement())) {
-                        if(String.valueOf(statementNode).contains(label)){
-                            return Optional.of(new IfNode(condition, label));
-                        }else throw new Exception("Label does not exist");
-                    }else throw new Exception("Condition not found");
+                tokenM.matchAndRemove(Token.TokenType.WORD);
+                for(int i = 0; tokenM.moreTokens(); i++){
+                   Optional<Token.TokenType> iToken = tokenM.peek(i);
+                   if(iToken.equals(Optional.of(Token.TokenType.LABEL))){
+                       String str = token.get(i).getValue();
+                       if(str.equals(label))
+                           return Optional.of(new IfNode(condition, label));
+                   }
                 }
             } else throw new Exception("Boolean does not exist");
         } else throw new Exception("If block not found");
@@ -431,21 +459,21 @@ public class Parser {
      */
     private Optional<StatementNode> whileStatement() throws Exception {
         String endLabel = "";
-        String currState = "";
         if (tokenM.matchAndRemove(Token.TokenType.WHILE).equals(Optional.of(Token.TokenType.WHILE))) {
-            StatementsNode state = new StatementsNode();
             Optional<StatementNode> condition = parseBoolean();
-            StatementNode label;
             if (condition.isPresent()) {
                 if (tokenM.peek(0).equals(Optional.of(Token.TokenType.WORD))) {
                     endLabel = token.get(0).getValue();
                     tokenM.matchAndRemove(Token.TokenType.WORD);
                 }
+                acceptSeparators();
                 Optional<StatementNode> loopState = statement();
+                acceptSeparators();
                 if (tokenM.peek(0).equals(Optional.of(Token.TokenType.LABEL))) {
-                    label = statements();
-                    if(String.valueOf(label).contains(endLabel)){
-                        return Optional.of(new WhileNode(condition, loopState, Optional.ofNullable(label)));
+                    String labelName = token.get(0).getValue();
+                    tokenM.matchAndRemove(Token.TokenType.LABEL);
+                    if(labelName.equals(endLabel)){
+                        return Optional.of(new WhileNode(condition, loopState, Optional.of(new LabeledStatementNode(endLabel))));
                     } else throw new Exception("Label does not exist");
                 } else throw new Exception("Condition not found");
             }
@@ -461,10 +489,11 @@ public class Parser {
      */
     private Optional<StatementNode> parseBoolean() throws Exception {
         Node left = expression();
+        tokenM.matchAndRemove(Token.TokenType.WORD);
         Token.TokenType operand = null;
         boolean foundExp = false;
         for (var i : expVal) { //Loop through our possible boolean comparison symbols to see if any matches
-            if (token.get(0).toString().equals(i)) {
+            if (token.get(0).toString().contains(i)) {
                 operand = token.get(0).getTokenValue();
                 foundExp = true;
             }
@@ -482,7 +511,7 @@ public class Parser {
      * @return {@code FunctionNode}
      * @throws Exception if there is no closing parenthesis
      */
-    private Optional<FunctionNode> functionInvocation() throws Exception {
+    private Optional<StatementNode> functionInvocation() throws Exception {
         String function = null;
         String paramName;
         ArrayList<VariableNode> params = new ArrayList<>();
@@ -491,8 +520,9 @@ public class Parser {
                 function = String.valueOf(token.get(0).toString().equals(i));
             }
         }
-        tokenM.matchAndRemove(Token.TokenType.WORD);
+        //tokenM.matchAndRemove(Token.TokenType.WORD);
         if (tokenM.matchAndRemove(Token.TokenType.LPAREN).equals(Optional.of(Token.TokenType.LPAREN))) {
+            //Add switch statement to deal with different parameters
             do {
                 if (tokenM.matchAndRemove(Token.TokenType.WORD).equals(Optional.of(Token.TokenType.WORD))) {
                     paramName = token.get(0).getValue();

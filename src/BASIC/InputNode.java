@@ -11,5 +11,5 @@ public class InputNode extends StatementNode{
     }
 
     @Override
-    public String toString(){return "(" + inputList + ")";}
+    public String toString(){return "InputNode[" + inputList + "]";}
 }

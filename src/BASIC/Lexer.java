@@ -131,26 +131,23 @@ public class Lexer {
             if(Character.isLetter(currentChar) || Character.isDigit(currentChar) || currentChar == '_'){
                 processedString += currentChar;
                 position++;
-            }
-            if(Document.peek(1) == ':'){
+            }if(Document.peek(1) == ':'){
                 currentChar = Document.getChar();
                 position++;
                 Document.swallow(1);
                 return new Token(Token.TokenType.LABEL, processedString);
-            }
-            else if (keyWords.containsKey(processedString.toLowerCase()) && (Character.isWhitespace(Document.peek(1)) || Document.peek(1) == '\n' || Document.isDone() || oneCharExp.containsKey(String.valueOf(Document.peek(1))))){
+            } else if (keyWords.containsKey(processedString.toLowerCase()) && (Character.isWhitespace(Document.peek(1)) || Document.peek(1) == '\n' || Document.isDone() || oneCharExp.containsKey(String.valueOf(Document.peek(1))))){
             return new Token(String.valueOf(keyWords.get(processedString.toLowerCase())));
-            }
-            else if(functions.containsKey(processedString) && ((Document.peek(1) == '$') || (Document.peek(1) == '%'))){
-                currentChar = Document.getChar();
+            } else if(functions.containsKey(processedString.toLowerCase()) && ((Document.peek(1) == '$') || (Document.peek(1) == '%'))){
                 position++;
-                Document.swallow(1);
                 return new Token(String.valueOf(functions.get(processedString.toLowerCase())));
-            }
-            else if(Document.isDone()){
+            } else if(((Document.peek(1) == ('$') || (Document.peek(1) == '%')))){
+                currentChar = Document.getChar();
+                processedString += currentChar;
+                return new Token(Token.TokenType.WORD, processedString);
+            } else if(Document.isDone()){
                 break;
-            }
-            else if(oneCharExp.containsKey(String.valueOf(Document.peek(1)))) break;
+            } else if(oneCharExp.containsKey(String.valueOf(Document.peek(1)))) break;
             else if(!Character.isLetter(currentChar) && !Character.isDigit(currentChar) && currentChar != '_' && !Character.isWhitespace(currentChar)){
                 throw new Exception("Invalid character @ " + line + ":" + position);
             }

@@ -7,5 +7,5 @@ public class GoSubNode extends StatementNode{
     }
 
     @Override
-    public String toString() {return "GOSUB(" + str + ")";}
+    public String toString() {return "GoSubNode[" + str + "]";}
 }

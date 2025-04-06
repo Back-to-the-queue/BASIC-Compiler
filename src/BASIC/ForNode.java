@@ -37,6 +37,6 @@ public class ForNode extends StatementNode{
 
     @Override
     public String toString() {
-        return null;
+        return "ForNode[" + variable.orElse(null) + ", " + end + ", " + increment + ", " + statements + "]";
     }
 }

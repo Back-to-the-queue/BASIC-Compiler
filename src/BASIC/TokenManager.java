@@ -15,6 +15,7 @@ public class TokenManager {
      */
     public TokenManager(LinkedList<Token> token){
         this.tokens = token;
+        //System.out.println(tokens);
     }
 
     /**
@@ -46,6 +47,7 @@ public class TokenManager {
     public Optional<Token.TokenType> matchAndRemove(Token.TokenType t){
         if ((!tokens.isEmpty()) && (tokens.get(0).getTokenValue().equals(t))) {
             tokens.remove(0);
+            //System.out.println(tokens);
             return Optional.of(t);
         }
         return Optional.empty();

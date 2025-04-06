@@ -31,5 +31,5 @@ public class VariableNode extends Node {
      * @returnn the string value of the node
      */
     @Override
-    public String toString() {return "(" + name + ")" ;}
+    public String toString() {return "VariableNode[" + name + "]";}
 }

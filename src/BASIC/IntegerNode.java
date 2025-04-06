@@ -28,8 +28,6 @@ public class IntegerNode extends Node {
      * @return the value of number in a String form
      */
     @Override
-    public String toString() {
-        return String.valueOf(number);
-    }
+    public String toString() {return "IntegerNode[" + String.valueOf(number) + "]";}
 
 }

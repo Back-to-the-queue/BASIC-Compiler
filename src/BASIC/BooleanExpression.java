@@ -26,9 +26,6 @@ public class BooleanExpression extends StatementNode{
     }
 
     @Override
-    public String toString()
-    {
-        return (this.leftExpression.toString() + " " + condition + " " + rightExpression.toString());
-    }
+    public String toString() {return "BooleanNode[" + (this.leftExpression.toString() + " " + condition + " " + rightExpression.toString()) + "]";}
 
 }

@@ -3,6 +3,9 @@ package BASIC_Test.Lexer;
 import BASIC.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import javax.security.sasl.SaslServer;
+
 import static org.junit.jupiter.api.Assertions.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -23,15 +26,17 @@ public class LexerTest {
 
     @Test
     public void testProcessWord() throws Exception {
-        String testInput = "print input data";
+        String testInput = "print input data \n LEFT$ \n name$";
         Lexer lexer = new Lexer(testInput);
         lexer.lex();
         LinkedList<Token> tokens = Lexer.tokenList;
-
-        assertEquals(3, tokens.size(), "Lexer should tokenize 3 words.");
+        System.out.println(tokens);
+        assertEquals(8, tokens.size(), "Lexer should tokenize 3 words.");
         assertEquals(Token.TokenType.PRINT, tokens.get(0).getTokenValue());
         assertEquals(Token.TokenType.INPUT, tokens.get(1).getTokenValue());
         assertEquals(Token.TokenType.DATA, tokens.get(2).getTokenValue());
+        assertEquals(Token.TokenType.LEFT, tokens.get(4).getTokenValue());
+
     }
 
     @Test

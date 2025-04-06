@@ -16,5 +16,5 @@ public class FunctionNode extends StatementNode{
     }
 
     @Override
-    public String toString() {return name + "(" + params + ")";}
+    public String toString() {return "FunctionNode[" + name + "(" + params + ")]";}
 }

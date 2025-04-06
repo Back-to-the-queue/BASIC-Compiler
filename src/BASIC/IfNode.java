@@ -13,7 +13,5 @@ public class IfNode extends StatementNode{
     public String getEndLabel() {return endLabel;}
 
     @Override
-    public String toString() {
-        return null;
-    }
+    public String toString() {return "IfNode[" + bool.toString() + endLabel + "]";}
 }
