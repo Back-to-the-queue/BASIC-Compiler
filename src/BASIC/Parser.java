@@ -195,7 +195,7 @@ public class Parser {
     /**
      * Adds the Statements to the list in StatementsNode
      *
-     * @return list of StatementsNode
+     * @return list of {@code StatementsNode}
      */
     public StatementNode statements() throws Exception {
         List<Optional<StatementNode>> statementsList = new ArrayList<>();
@@ -212,10 +212,9 @@ public class Parser {
     /**
      * Accepts a statement and returns if it is a print statement
      *
-     * @return a PrintNode
-     * @throws Exception
-     */
-    private Optional<StatementNode> printStatement() throws Exception {
+     * @return {@code PrintNode}
+      */
+    private Optional<StatementNode> printStatement(){
         if (tokenM.matchAndRemove(Token.TokenType.PRINT).equals(Optional.of(Token.TokenType.PRINT))) {
             List<Node> toPrint = printList();
             return Optional.of(new PrintNode(toPrint));
@@ -225,7 +224,7 @@ public class Parser {
     /**
      * Accepts a list of expressions to be printed
      */
-    private List<Node> printList() throws Exception {
+    private List<Node> printList(){
         List<Node> printList = new ArrayList<>();
         while (true) {
             Optional<Token.TokenType> pToken = tokenM.peek(0);
@@ -255,10 +254,9 @@ public class Parser {
     /**
      * Parses through the assignment
      *
-     * @return
-     * @throws Exception
+     * @return {@code AssignmentNode}
      */
-    private Optional<StatementNode> assignment() throws Exception {
+    private Optional<StatementNode> assignment(){
         var left = expression();
         Node right;
         Optional<Token.TokenType> aToken = tokenM.peek(0);
@@ -279,8 +277,9 @@ public class Parser {
     }
 
     /**
-     * @return
-     * @throws Exception
+     * Parses through the Read statement
+     * @return {@code ReadNode}
+     * @throws Exception if a variable is not found
      */
     private Optional<StatementNode> readStatement() throws Exception {
         List<VariableNode> readList = new ArrayList<>();
@@ -298,12 +297,12 @@ public class Parser {
     }
 
     /**
-     * @return
+     * Parses through the input statement
+     * @return {@code InputNode}
      */
     private Optional<StatementNode> inputStatement() {
         List<Node> inputList = new ArrayList<>();
         String str;
-        String varName;
         if (tokenM.matchAndRemove(Token.TokenType.INPUT).equals(Optional.of(Token.TokenType.INPUT))) {
             do {
                 if (token.get(0).getTokenValue().equals(Token.TokenType.STRINGLITERAL)) {
@@ -320,10 +319,10 @@ public class Parser {
     }
 
     /**
-     * @return
-     * @throws Exception
+     * Parses through the data statement
+     * @return {@code DataNode}
      */
-    private Optional<StatementNode> dataStatement() throws Exception {
+    private Optional<StatementNode> dataStatement(){
         List<Node> dataList = new ArrayList<>();
         Node dataVar = null;
         if (tokenM.matchAndRemove(Token.TokenType.DATA).equals(Optional.of(Token.TokenType.DATA))) {
