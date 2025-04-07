@@ -1,5 +1,19 @@
+F = 100
+GOSUB FtoC
+PRINT "Temperature in Celsius:", C
 
-PRINT "Random number:", RANDOM()
+IF C < 40 THEN printCold
+
+PRINT "Counting from 1 to 5:"
+FOR X = 1 TO 5
+    PRINT X
+NEXT X
+
+WHILE Y < 3 endWhileLabel
+    Y = Y + 1
+endWhileLabel:
+
+name$ = "BASIC Compiler"
 
 DATA 42, "Hello BASIC"
 READ num, greeting$
@@ -10,8 +24,8 @@ PRINT "Hi", userName$, "you are", userAge, "years old!"
 
 FtoC:
     C = 5 * (F - 32) / 9
-    RETURN
 
 printCold:
     PRINT "It's cold!"
-    END
+
+END

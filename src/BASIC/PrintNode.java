@@ -26,5 +26,5 @@ public class PrintNode extends StatementNode{
      * @return the string value of the node
      */
     @Override
-    public String toString() {return "PrintNode(" + printList + ")";}
+    public String toString() {return "PrintNode[" + printList + "]";}
 }

@@ -47,7 +47,6 @@ public class TokenManager {
     public Optional<Token.TokenType> matchAndRemove(Token.TokenType t){
         if ((!tokens.isEmpty()) && (tokens.get(0).getTokenValue().equals(t))) {
             tokens.remove(0);
-            //System.out.println(tokens);
             return Optional.of(t);
         }
         return Optional.empty();

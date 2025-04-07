@@ -1,16 +1,17 @@
 package BASIC;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class FunctionNode extends StatementNode{
 
     private final String name;
-    private final List<VariableNode> params;
+    private final List<Node> params;
 
     public String getName() {return name;}
 
-    public List<VariableNode> getParams() {return params;}
-    public FunctionNode(String functionName, List<VariableNode> params) {
+    public List<Node> getParams() {return params;}
+    public FunctionNode(String functionName, ArrayList<Node> params) {
         this.name = functionName;
         this.params = params;
     }

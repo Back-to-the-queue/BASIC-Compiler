@@ -26,5 +26,5 @@ public class StatementsNode extends StatementNode{
      * @return the string value of the node
      */
     @Override
-    public String toString() {return "StatementsNode(" + statements + ")" ;}
+    public String toString() {return "StatementsNode[" + statements + "]" ;}
 }

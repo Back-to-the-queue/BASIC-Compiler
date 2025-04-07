@@ -37,14 +37,12 @@ public class Parser {
      * Expression uses term() and matchAndRemove to parse through any possible expressions
      *
      * @return a partial answer if parsing is incomplete
-     * @throws Exception
      */
-    private Node expression() throws Exception {
+    private Node expression() {
         var left = term();
         while (tokenM.moreTokens()) {
             Optional<Token.TokenType> op = tokenM.peek(0);
             if (op.isEmpty()) break;
-
             Token.TokenType eToken = op.get();
             switch (eToken) {
                 case PLUS:
@@ -68,9 +66,8 @@ public class Parser {
      * Uses factor() and matchAndRemove
      *
      * @return a partial answer if parsing is incomplete
-     * @throws Exception
      */
-    private Node term() throws Exception {
+    private Node term() {
         Node left = factor();
         while (tokenM.moreTokens()) {
             Optional<Token.TokenType> op = tokenM.peek(0);
@@ -83,8 +80,7 @@ public class Parser {
                     var right = factor();
                     left = new MathOpNode(
                             tToken == Token.TokenType.TIMES ? MathOpNode.OperationType.MULTIPLY : MathOpNode.OperationType.DIVIDE,
-                            left,
-                            Optional.of(right)
+                            left, Optional.of(right)
                     );
                     break;
                 default:
@@ -96,12 +92,14 @@ public class Parser {
 
     /**
      * @return a partial answer if parsing is incomplete
-     * @throws IllegalStateException When there are less tokes than expected or an unexpected token
+     * @throws IllegalStateException When there are fewer tokens than expected or an unexpected token
      */
-    private Node factor() throws Exception {
+    private Node factor() throws IllegalStateException {
         Token.TokenType fToken = tokenM.peek(0).orElseThrow();
         if (fToken == Token.TokenType.WORD) {
-            return new VariableNode(token.get(0).getValue());
+            var variable = token.get(0).getValue();
+            tokenM.matchAndRemove(fToken);
+            return new VariableNode(variable);
         }
         if (!tokenM.moreTokens()) throw new IllegalStateException("Less tokens than expected in factor");
         Optional<Token.TokenType> op = tokenM.peek(0);
@@ -116,6 +114,13 @@ public class Parser {
                 tokenM.matchAndRemove(Token.TokenType.NUMBER);
                 return new IntegerNode(integer);
             }
+        } else if(token.get(0).getTokenValue().equals(Token.TokenType.LPAREN)){
+            tokenM.matchAndRemove(Token.TokenType.LPAREN);
+            var expression = expression();
+            if(token.get(0).getTokenValue().equals(Token.TokenType.RPAREN)){
+                tokenM.matchAndRemove(Token.TokenType.RPAREN);
+                return expression;
+            }else throw new IllegalStateException("Uneven Parenthesis");
         }
         throw new IllegalStateException("Unexpected token type in factor");
     }
@@ -136,7 +141,6 @@ public class Parser {
         }
         if (!tokenM.moreTokens()) return Optional.empty();
         Token.TokenType sToken = token.get(0).getTokenValue();
-        //acceptSeparators();
         switch (sToken) {
             case PRINT:
                 state = printStatement();
@@ -185,24 +189,23 @@ public class Parser {
             default:
                 throw new IllegalStateException("Unexpected statement type in statement");
         }
-        //acceptSeparators();
         return state;
     }
 
     /**
      * Adds the Statements to the list in StatementsNode
      *
-     * @return
+     * @return list of StatementsNode
      */
     public StatementNode statements() throws Exception {
         List<Optional<StatementNode>> statementsList = new ArrayList<>();
         while (tokenM.moreTokens()){
             Optional<Token.TokenType> op = tokenM.peek(0);
             if (op.isEmpty()) break;
+            acceptSeparators();
             Optional<StatementNode> statement = statement();
             statementsList.add(statement);
         }
-        System.out.println(statementsList);
         return new StatementsNode(statementsList);
     }
 
@@ -238,7 +241,6 @@ public class Parser {
                     break;
                 case WORD:
                     item = expression();
-                    tokenM.matchAndRemove(Token.TokenType.WORD);
                     break;
             }
             printList.add(item);
@@ -257,8 +259,7 @@ public class Parser {
      * @throws Exception
      */
     private Optional<StatementNode> assignment() throws Exception {
-        var left = factor();
-        tokenM.matchAndRemove(Token.TokenType.WORD);
+        var left = expression();
         Node right;
         Optional<Token.TokenType> aToken = tokenM.peek(0);
         if (aToken.isEmpty()) return Optional.empty();
@@ -270,7 +271,6 @@ public class Parser {
                 tokenM.matchAndRemove(Token.TokenType.STRINGLITERAL);
             } else {
                 right = expression();
-                tokenM.matchAndRemove(Token.TokenType.WORD);
             }
             return Optional.of(new AssignmentNode(left, right));
         } else {
@@ -306,12 +306,13 @@ public class Parser {
         String varName;
         if (tokenM.matchAndRemove(Token.TokenType.INPUT).equals(Optional.of(Token.TokenType.INPUT))) {
             do {
-                if (tokenM.matchAndRemove(Token.TokenType.STRINGLITERAL).equals(Optional.of(Token.TokenType.STRINGLITERAL))) {
+                if (token.get(0).getTokenValue().equals(Token.TokenType.STRINGLITERAL)) {
                     str = token.get(0).getValue();
+                    tokenM.matchAndRemove(Token.TokenType.STRINGLITERAL);
                     inputList.add(new StringNode(str));
-                } else if (tokenM.matchAndRemove(Token.TokenType.WORD).equals(Optional.of(Token.TokenType.WORD))) {
-                    varName = token.get(0).getValue();
-                    inputList.add(new VariableNode(varName));
+                } else if (token.get(0).getTokenValue().equals(Token.TokenType.WORD)) {
+                    var iNode = expression();
+                    inputList.add(iNode);
                 }
             } while (tokenM.matchAndRemove(Token.TokenType.COMMA).equals(Optional.of(Token.TokenType.COMMA)));
         } else return Optional.empty();
@@ -324,26 +325,23 @@ public class Parser {
      */
     private Optional<StatementNode> dataStatement() throws Exception {
         List<Node> dataList = new ArrayList<>();
-        String varName;
-        int integer;
-        float floats;
+        Node dataVar = null;
         if (tokenM.matchAndRemove(Token.TokenType.DATA).equals(Optional.of(Token.TokenType.DATA))) {
             do {
-                if (token.get(0).getTokenValue().equals(Token.TokenType.WORD)) {
-                    varName = token.get(0).getValue();
-                    tokenM.matchAndRemove(Token.TokenType.WORD);
-                    dataList.add(new VariableNode(varName));
-                } else if (token.get(0).getTokenValue().equals(Token.TokenType.NUMBER)) {
-                    if (token.get(0).getValue().contains(".")) {
-                        floats = Float.parseFloat(token.get(0).getValue());
-                        tokenM.matchAndRemove(Token.TokenType.NUMBER);
-                        dataList.add(new FloatNode(floats));
-                    } else {
-                        integer = Integer.parseInt(token.get(0).getValue());
-                        tokenM.matchAndRemove(Token.TokenType.NUMBER);
-                        dataList.add(new IntegerNode(integer));
-                    }
-                } else throw new Exception("Variable Not Found");
+                var dNode = token.get(0).getTokenValue();
+                switch(dNode){
+                    case WORD:
+                        dataVar = expression();
+                        dataList.add(dataVar);
+                    case STRINGLITERAL:
+                        dataVar = new StringNode(token.get(0).getValue());
+                        tokenM.matchAndRemove(Token.TokenType.STRINGLITERAL);
+                        break;
+                    case NUMBER:
+                        dataVar = expression();
+                        dataList.add(dataVar);
+                }
+                dataList.add(dataVar);
             } while (tokenM.matchAndRemove(Token.TokenType.COMMA).equals(Optional.of(Token.TokenType.COMMA)));
         } else return Optional.empty();
         return Optional.of(new DataNode(dataList));
@@ -429,8 +427,6 @@ public class Parser {
      * @throws Exception if not implemented correctly
      */
     private Optional<StatementNode> ifStatement() throws Exception {
-        StatementsNode state = new StatementsNode();
-        Optional<StatementNode> isLabel;
         if (tokenM.matchAndRemove(Token.TokenType.IF).equals(Optional.of(Token.TokenType.IF))) {
             Optional<StatementNode> condition = parseBoolean();
             if (condition.isPresent()) {
@@ -513,21 +509,35 @@ public class Parser {
      */
     private Optional<StatementNode> functionInvocation() throws Exception {
         String function = null;
-        String paramName;
-        ArrayList<VariableNode> params = new ArrayList<>();
+        Node param;
+        ArrayList<Node> params = new ArrayList<>();
         for (var i : functions) {
             if (token.get(0).toString().equals(i)) {
                 function = String.valueOf(token.get(0).toString().equals(i));
+                tokenM.matchAndRemove(token.get(0).getTokenValue());
             }
         }
-        //tokenM.matchAndRemove(Token.TokenType.WORD);
+        if(token.get(0).getTokenValue().equals((Token.TokenType.DOLLAR)) ||
+                token.get(0).getTokenValue().equals((Token.TokenType.MOD))){
+            function += token.get(0).getValue();
+        }
         if (tokenM.matchAndRemove(Token.TokenType.LPAREN).equals(Optional.of(Token.TokenType.LPAREN))) {
-            //Add switch statement to deal with different parameters
             do {
-                if (tokenM.matchAndRemove(Token.TokenType.WORD).equals(Optional.of(Token.TokenType.WORD))) {
-                    paramName = token.get(0).getValue();
-                    params.add(new VariableNode(paramName));
-                } else throw new Exception("Variable Not Found");
+                var funcToken = token.get(0).getTokenValue();
+                switch(funcToken){
+                    case WORD:
+                    case NUMBER:
+                        param = expression();
+                        params.add(param);
+                        break;
+                    case STRINGLITERAL:
+                        param = new StringNode(token.get(0).getValue());
+                        tokenM.matchAndRemove(Token.TokenType.STRINGLITERAL);
+                        break;
+                    default:
+                        throw new Exception("Incorrect parameter type");
+                }
+                params.add(param);
             } while (tokenM.matchAndRemove(Token.TokenType.COMMA).equals(Optional.of(Token.TokenType.COMMA)));
         }
         if (tokenM.matchAndRemove(Token.TokenType.RPAREN).equals(Optional.of(Token.TokenType.RPAREN))) {

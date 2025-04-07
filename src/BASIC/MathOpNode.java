@@ -64,6 +64,6 @@ public class MathOpNode extends Node {
      */
     @Override
     public String toString() {
-        return left.toString() + " " + operationType.toString() + " " + right.toString() + " ";
+        return "MathOpNode[" + left.toString() + " " + operationType.toString() + " " + right.toString() + "]";
     }
 }
