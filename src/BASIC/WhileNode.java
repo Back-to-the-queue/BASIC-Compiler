@@ -1,5 +1,5 @@
 package BASIC;
-
+import java.util.List;
 import java.util.Optional;
 
 public class WhileNode extends StatementNode{
@@ -11,10 +11,11 @@ public class WhileNode extends StatementNode{
 
     private Optional<StatementNode> endLabel;
 
-    public Optional<StatementNode> getLoopState() {return loopState;}
+    public List<Optional<StatementNode>> getLoopState() {return loopState;}
 
-    private Optional<StatementNode> loopState;
-    public WhileNode(Optional<StatementNode> cond, Optional<StatementNode> loop,Optional<StatementNode> label) {
+    private List<Optional<StatementNode>> loopState;
+
+    public WhileNode(Optional<StatementNode> cond, List<Optional<StatementNode>> loop,Optional<StatementNode> label) {
         this.condition = cond;
         this.endLabel = label;
         this.loopState = loop;

@@ -376,6 +376,7 @@ public class Parser {
      */
     private Optional<StatementNode> forStatement() throws Exception {
         Optional<StatementNode> variable;
+        List<Optional<StatementNode>> statements = new ArrayList<>();
         int end;
         int increment = 1;
         if (tokenM.matchAndRemove(Token.TokenType.FOR).equals(Optional.of(Token.TokenType.FOR))) {
@@ -389,15 +390,14 @@ public class Parser {
                 }
             }else throw new Exception("End range not found");
         }else throw new Exception("Start range not found");
+        while(!token.get(0).getTokenValue().equals(Token.TokenType.NEXT)){
         acceptSeparators();
         Optional<StatementNode> state = statement();
+        statements.add(state);
         acceptSeparators();
+        }
         if(tokenM.matchAndRemove(Token.TokenType.NEXT).equals(Optional.of(Token.TokenType.NEXT))){
-                Node last = expression();
-                if(!(variable.get().toString().contains(last.toString())))
-                    throw new Exception("Variable Not Found");
-                tokenM.matchAndRemove(Token.TokenType.WORD);
-                return Optional.of(new ForNode(variable,new IntegerNode(end), new IntegerNode(increment), state));
+            return Optional.of(new ForNode(variable,new IntegerNode(end), new IntegerNode(increment), statements));
         }
         return Optional.empty();
     }
@@ -454,6 +454,7 @@ public class Parser {
      */
     private Optional<StatementNode> whileStatement() throws Exception {
         String endLabel = "";
+        List<Optional<StatementNode>> statements = new ArrayList<>();
         if (tokenM.matchAndRemove(Token.TokenType.WHILE).equals(Optional.of(Token.TokenType.WHILE))) {
             Optional<StatementNode> condition = parseBoolean();
             if (condition.isPresent()) {
@@ -461,14 +462,17 @@ public class Parser {
                     endLabel = token.get(0).getValue();
                     tokenM.matchAndRemove(Token.TokenType.WORD);
                 }
-                acceptSeparators();
-                Optional<StatementNode> loopState = statement();
-                acceptSeparators();
+                while(token.get(0).getTokenValue().equals(Token.TokenType.LABEL)){
+                    acceptSeparators();
+                    Optional<StatementNode> loopState = statement();
+                    statements.add(loopState);
+                    acceptSeparators();
+                }
                 if (tokenM.peek(0).equals(Optional.of(Token.TokenType.LABEL))) {
                     String labelName = token.get(0).getValue();
                     tokenM.matchAndRemove(Token.TokenType.LABEL);
                     if(labelName.equals(endLabel)){
-                        return Optional.of(new WhileNode(condition, loopState, Optional.of(new LabeledStatementNode(endLabel))));
+                        return Optional.of(new WhileNode(condition, statements, Optional.of(new LabeledStatementNode(endLabel))));
                     } else throw new Exception("Label does not exist");
                 } else throw new Exception("Condition not found");
             }

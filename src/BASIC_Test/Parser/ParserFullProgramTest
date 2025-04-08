@@ -7,7 +7,7 @@ IF C < 40 THEN printCold
 PRINT "Counting from 1 to 5:"
 FOR X = 1 TO 5
     PRINT X
-NEXT X
+NEXT
 
 WHILE Y < 3 endWhileLabel
     Y = Y + 1

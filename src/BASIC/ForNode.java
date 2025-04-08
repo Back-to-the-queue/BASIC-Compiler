@@ -17,9 +17,10 @@ public class ForNode extends StatementNode{
 
     private Node increment;
 
-    public List<StatementNode> getStatements() {return statements;}
+    public List<Optional<StatementNode>> getStatements() {return statements;}
 
-    private final List<StatementNode> statements = new ArrayList<StatementNode>();
+    private List<Optional<StatementNode>> statements = new ArrayList<Optional<StatementNode>>();
+
 
     /**
      * This constructor holds a for loop
@@ -28,11 +29,11 @@ public class ForNode extends StatementNode{
      * @param end the ending integer value
      * @param statement the statement within the for loop
      */
-    public ForNode(Optional<StatementNode> reference,Node end, Node increment, Optional<StatementNode> statement) {
+    public ForNode(Optional<StatementNode> reference, Node end, Node increment, List<Optional<StatementNode>> statement) {
         this.variable = reference;
         this.end = end;
         this.increment = increment;
-        this.statements.add(statement.get());
+        this.statements = statement;
     }
 
     @Override
