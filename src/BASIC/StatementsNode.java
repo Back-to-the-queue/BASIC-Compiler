@@ -7,7 +7,6 @@ import java.util.Optional;
 public class StatementsNode extends StatementNode{
     private List<Optional<StatementNode>> statements = new ArrayList<>(); // List of Statements
     public StatementsNode(List<Optional<StatementNode>> statement){this.statements = statement;}
-    public StatementsNode(){}
 
     /**
      * Accessor method for the {@code StatementsNode}
@@ -17,6 +16,7 @@ public class StatementsNode extends StatementNode{
 
     /**
      * Accessor for the current {@code StatementNode}
+     *
      * @return the current {@code StatementNode}
      */
     public Optional<StatementNode> getCurrentStatement() {return statements.get(0);}

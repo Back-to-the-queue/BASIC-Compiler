@@ -15,7 +15,7 @@ public class Main {
         Path myPath = Paths.get(args[0]); //Sets file path to the selected file
         String document = new String(Files.readAllBytes(myPath));
         LinkedList<Token> tokenList = new LinkedList<>(); //Creates an ArrayList containing the list of tokens
-        LinkedList<Token> token2 = new LinkedList<>(); //Creates a second Arraylist for the tokens
+        LinkedList<Token> token2; //Creates a second Arraylist for the tokens
 
         var lexer = new Lexer(document);
         try {
@@ -24,10 +24,9 @@ public class Main {
             throw new RuntimeException(e);
         }
         token2 = Lexer.tokenList;
-        for (int i = 0; i < token2.size(); i++) {
-            tokenList.add(token2.get(i));
+        for (Token token : token2) {
+            tokenList.add(token);
         }
-
         for (int i = 0; i < tokenList.size(); i++) {
             System.out.print(tokenList.get(i));
         }
