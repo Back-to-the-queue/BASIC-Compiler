@@ -38,7 +38,7 @@ public class Parser {
      *
      * @return a partial answer if parsing is incomplete
      */
-    private Node expression() {
+    private Node expression() throws Exception{
         var left = term();
         while (tokenM.moreTokens()) {
             Optional<Token.TokenType> op = tokenM.peek(0);
@@ -67,7 +67,7 @@ public class Parser {
      *
      * @return a partial answer if parsing is incomplete
      */
-    private Node term() {
+    private Node term() throws Exception {
         Node left = factor();
         while (tokenM.moreTokens()) {
             Optional<Token.TokenType> op = tokenM.peek(0);
@@ -94,17 +94,24 @@ public class Parser {
      * @return a partial answer if parsing is incomplete
      * @throws IllegalStateException When there are fewer tokens than expected or an unexpected token
      */
-    private Node factor() throws IllegalStateException {
+    private Node factor() throws Exception {
         Token.TokenType fToken = tokenM.peek(0).orElseThrow();
         if (fToken == Token.TokenType.WORD) {
             var variable = token.get(0).getValue();
             tokenM.matchAndRemove(fToken);
             return new VariableNode(variable);
+        }else if(fToken.equals(Token.TokenType.LEFT) ||
+                    fToken.equals(Token.TokenType.MID) ||
+                        fToken.equals(Token.TokenType.RIGHT)||
+                            fToken.equals(Token.TokenType.NUM) ||
+                                    fToken.equals(Token.TokenType.VAL) ||
+                                        fToken.equals(Token.TokenType.RANDOM)) {
+            return functionInvocation();
         }
-        if (!tokenM.moreTokens()) throw new IllegalStateException("Less tokens than expected in factor");
+        if (!tokenM.moreTokens()) throw new Exception("Less tokens than expected in factor");
         Optional<Token.TokenType> op = tokenM.peek(0);
-        if (op.isEmpty()) throw new IllegalStateException("Unexpected token in factor");
-        if (fToken == Token.TokenType.NUMBER) {
+        if (op.isEmpty()) throw new Exception("Unexpected token in factor");
+        if (fToken.equals(Token.TokenType.NUMBER)) {
             if (token.get(0).getValue().contains(".")) {
                 var floats = Float.parseFloat(token.get(0).getValue());
                 tokenM.matchAndRemove(Token.TokenType.NUMBER);
@@ -114,7 +121,7 @@ public class Parser {
                 tokenM.matchAndRemove(Token.TokenType.NUMBER);
                 return new IntegerNode(integer);
             }
-        } else if(token.get(0).getTokenValue().equals(Token.TokenType.LPAREN)){
+        } else if(fToken.equals(Token.TokenType.LPAREN)){
             tokenM.matchAndRemove(Token.TokenType.LPAREN);
             var expression = expression();
             if(token.get(0).getTokenValue().equals(Token.TokenType.RPAREN)){
@@ -179,13 +186,6 @@ public class Parser {
             case GOSUB:
                 state = goSubStatement();
                 break;
-            case LEFT:
-            case RANDOM:
-            case NUM:
-            case VAL:
-            case RIGHT:
-                state = functionInvocation();
-                break;
             default:
                 throw new IllegalStateException("Unexpected statement type in statement");
         }
@@ -214,7 +214,7 @@ public class Parser {
      *
      * @return {@code PrintNode}
       */
-    private Optional<StatementNode> printStatement(){
+    private Optional<StatementNode> printStatement() throws Exception{
         if (tokenM.matchAndRemove(Token.TokenType.PRINT).equals(Optional.of(Token.TokenType.PRINT))) {
             List<Node> toPrint = printList();
             return Optional.of(new PrintNode(toPrint));
@@ -224,7 +224,7 @@ public class Parser {
     /**
      * Accepts a list of expressions to be printed
      */
-    private List<Node> printList(){
+    private List<Node> printList() throws Exception{
         List<Node> printList = new ArrayList<>();
         while (true) {
             Optional<Token.TokenType> pToken = tokenM.peek(0);
@@ -241,6 +241,14 @@ public class Parser {
                 case WORD:
                     item = expression();
                     break;
+                case RANDOM:
+                case LEFT:
+                case RIGHT:
+                case MID:
+                case NUM:
+                case VAL:
+                    item = functionInvocation();
+                    break;
             }
             printList.add(item);
             if (tokenM.peek(0).isPresent() && tokenM.peek(0).get() != Token.TokenType.COMMA) {
@@ -256,7 +264,7 @@ public class Parser {
      *
      * @return {@code AssignmentNode}
      */
-    private Optional<StatementNode> assignment(){
+    private Optional<StatementNode> assignment() throws Exception{
         var left = expression();
         Node right;
         Optional<Token.TokenType> aToken = tokenM.peek(0);
@@ -300,7 +308,7 @@ public class Parser {
      * Parses through the input statement
      * @return {@code InputNode}
      */
-    private Optional<StatementNode> inputStatement() {
+    private Optional<StatementNode> inputStatement() throws Exception{
         List<Node> inputList = new ArrayList<>();
         String str;
         if (tokenM.matchAndRemove(Token.TokenType.INPUT).equals(Optional.of(Token.TokenType.INPUT))) {
@@ -322,7 +330,7 @@ public class Parser {
      * Parses through the data statement
      * @return {@code DataNode}
      */
-    private Optional<StatementNode> dataStatement(){
+    private Optional<StatementNode> dataStatement() throws Exception{
         List<Node> dataList = new ArrayList<>();
         Node dataVar = null;
         if (tokenM.matchAndRemove(Token.TokenType.DATA).equals(Optional.of(Token.TokenType.DATA))) {
@@ -462,7 +470,7 @@ public class Parser {
                     endLabel = token.get(0).getValue();
                     tokenM.matchAndRemove(Token.TokenType.WORD);
                 }
-                while(token.get(0).getTokenValue().equals(Token.TokenType.LABEL)){
+                while(!(token.get(0).getTokenValue().equals(Token.TokenType.LABEL))){
                     acceptSeparators();
                     Optional<StatementNode> loopState = statement();
                     statements.add(loopState);
@@ -510,28 +518,33 @@ public class Parser {
      * @return {@code FunctionNode}
      * @throws Exception if there is no closing parenthesis
      */
-    private Optional<StatementNode> functionInvocation() throws Exception {
+    private Node functionInvocation() throws Exception {
         String function = null;
         Node param;
         ArrayList<Node> params = new ArrayList<>();
         for (var i : functions) {
-            if (token.get(0).toString().equals(i)) {
-                function = String.valueOf(token.get(0).toString().equals(i));
+            if (token.get(0).getValue().equals(i)) {
+                function = String.valueOf(token.get(0).getValue());
                 tokenM.matchAndRemove(token.get(0).getTokenValue());
+                break;
             }
         }
         if(token.get(0).getTokenValue().equals((Token.TokenType.DOLLAR)) ||
                 token.get(0).getTokenValue().equals((Token.TokenType.MOD))){
             function += token.get(0).getValue();
+            tokenM.matchAndRemove(token.get(0).getTokenValue());
         }
         if (tokenM.matchAndRemove(Token.TokenType.LPAREN).equals(Optional.of(Token.TokenType.LPAREN))) {
+            if (function != null && function.equals("RANDOM") && token.get(0).getTokenValue().equals(Token.TokenType.RPAREN)){
+                tokenM.matchAndRemove(Token.TokenType.RPAREN);
+                return new FunctionNode(function);
+            }
             do {
                 var funcToken = token.get(0).getTokenValue();
                 switch(funcToken){
                     case WORD:
                     case NUMBER:
                         param = expression();
-                        params.add(param);
                         break;
                     case STRINGLITERAL:
                         param = new StringNode(token.get(0).getValue());
@@ -544,7 +557,7 @@ public class Parser {
             } while (tokenM.matchAndRemove(Token.TokenType.COMMA).equals(Optional.of(Token.TokenType.COMMA)));
         }
         if (tokenM.matchAndRemove(Token.TokenType.RPAREN).equals(Optional.of(Token.TokenType.RPAREN))) {
-            return Optional.of(new FunctionNode(function, params));
+            return new FunctionNode(function, params);
         } else throw new Exception("Closing parenthesis not found");
     }
 

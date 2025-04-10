@@ -1,6 +1,9 @@
 package BASIC;
-
 import java.util.*;
+
+//Fix function in parser, change to node so it can be accessed by subroutines and expression
+//fix mathop in assignment
+
 
 /**
  * A {@code Interpreter} that handles the AST of Nodes created by the parser
@@ -13,11 +16,10 @@ public class Interpreter {
     public HashMap<String, String> stringVars = new HashMap<>();
     public HashMap<String, Integer> intVars = new HashMap<>();
     public HashMap<String, Float> floatVars = new HashMap<>();
-    private boolean loop = true;
-    private Optional<StatementNode> currentStatement;
     List<Optional<StatementNode>> statements;
+    public boolean loop = true;
 
-    Interpreter(StatementsNode statements) {
+    public Interpreter(StatementsNode statements) {
         this.statements = statements.getStatements();
         dataSearch(statements);
         labelSearch(statements);
@@ -29,8 +31,8 @@ public class Interpreter {
      * @throws Exception If the program uses incorrect syntax
      */
     public void interpret(StatementNode node)throws Exception {
-        currentStatement = Optional.ofNullable(node);
-        while (loop) {
+        Optional<StatementNode> currentStatement = Optional.ofNullable(node);
+        while(loop) {
             currentStatement.ifPresent(state -> {
                 if (state instanceof ReadNode readNode) {
                     List<VariableNode> vars = readNode.getVars();
@@ -76,9 +78,14 @@ public class Interpreter {
                         floatVars.put(String.valueOf(varName), Float.parseFloat(String.valueOf(assignType)));
                     }if (assignType instanceof StringNode) {
                         stringVars.put(String.valueOf(varName), String.valueOf(assignType));
-                    }if (assignType instanceof MathOpNode) {
-                        int exp = evaluateInteger(assignmentNode);
-                        intVars.put(String.valueOf(varName), exp);
+                    }if (assignType instanceof MathOpNode mathOp) {
+                        if(mathOp.getLeft() instanceof FloatNode) {
+                            float exp = evaluateFloat(assignmentNode);
+                            floatVars.put(String.valueOf(varName), exp);
+                        }else if(mathOp.getLeft() instanceof IntegerNode) {
+                            int exp = evaluateInteger(assignmentNode);
+                            intVars.put(String.valueOf(varName), exp);
+                        }
                     }
                 } else if (node instanceof InputNode inputNode) {
                     List<Node> nodeList = inputNode.getInputList();
@@ -87,9 +94,11 @@ public class Interpreter {
                         toBePrinted.add(String.valueOf(nodeList.get(0)));
                         nodeList.remove(0);
                     }
-                    for (int i = 0; i > nodeList.size(); i++) {
-                        if (nodeList.get(i) instanceof VariableNode) {
-                            VariableNode variableNode = (VariableNode) nodeList.get(1);
+                    System.out.println(toBePrinted);
+                    toBePrinted.clear();
+                    for (Node value : nodeList) {
+                        if (value instanceof VariableNode) {
+                            VariableNode variableNode = (VariableNode) nodeList.get(0);
                             String varName = variableNode.getName();
                             Scanner scanner = new Scanner(System.in);
                             System.out.println("Insert value for :" + varName);
@@ -200,9 +209,9 @@ public class Interpreter {
                 } else if (node instanceof ReturnNode) {
                     Optional<StatementNode> returnStatement = statements.pop();
                     returnStatement = Optional.ofNullable(currentStatement.next);
-                } else if (node instanceof EndNode) {
+                */} else if (node instanceof EndNode) {
                     loop = false;
-                */}
+                }
             });
             currentStatement = statements.get(1);
         }
@@ -216,24 +225,21 @@ public class Interpreter {
     public int evaluateInteger(Node node){
         if(node instanceof VariableNode variableNode){
             String variable = lookupVariable(variableNode.getName());
-            return Integer.parseInt(variable);
+            if (variable != null) {
+                return Integer.parseInt(variable);
+            }
         } if(node instanceof IntegerNode integerNode){
-            int num = integerNode.getNumber();
-            return num;
+            return integerNode.getNumber();
         } if(node instanceof MathOpNode mathOpNode){
             var left = evaluateInteger(mathOpNode);
             var op = mathOpNode.getOperationType();
             var right = evaluateInteger(mathOpNode);
-            switch (op){
-                case SUBTRACT:
-                    return left - right;
-                case ADD:
-                    return left + right;
-                case DIVIDE:
-                    return left / right;
-                case MULTIPLY:
-                    return left * right;
-            }
+            return switch (op) {
+                case SUBTRACT -> left - right;
+                case ADD -> left + right;
+                case DIVIDE -> left / right;
+                case MULTIPLY -> left * right;
+            };
         } if(node instanceof FunctionNode functionNode){
             String functionName = functionNode.getName();
             List<Node> params = functionNode.getParams();

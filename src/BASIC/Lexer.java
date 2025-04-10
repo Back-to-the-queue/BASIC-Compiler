@@ -194,14 +194,14 @@ public class Lexer {
             currentChar = Document.getChar();
             processedString += currentChar;
             position++;
-            return new Token(twoCharExp.get(processedString), line, position);
+            return new Token(twoCharExp.get(processedString), processedString);
         }
         else if(currentChar == '&' && Document.peek(1) != '&'){
             throw new Exception("Invalid character @ " + line + ":" + position + '\n' + "& expected");
         }
         else{
             processedString += currentChar;
-            return new Token(oneCharExp.get(processedString), line, position);
+            return new Token(oneCharExp.get(processedString), processedString);
         }
     }
 
