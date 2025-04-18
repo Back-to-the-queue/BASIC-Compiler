@@ -18,6 +18,10 @@ public class Interpreter {
     public HashMap<String, Float> floatVars = new HashMap<>();
     List<Optional<StatementNode>> statements;
     public boolean loop = true;
+    public boolean isTrue = false;
+    Optional<StatementNode> currentStatement;
+    Optional<StatementNode> skippedStatement;
+    public int nextIndex;
 
     public Interpreter(StatementsNode statements) {
         this.statements = statements.getStatements();
@@ -30,64 +34,81 @@ public class Interpreter {
      * @param node statement node to be evaluated
      * @throws Exception If the program uses incorrect syntax
      */
-    public void interpret(StatementNode node)throws Exception {
-        Optional<StatementNode> currentStatement = Optional.ofNullable(node);
+    public void interpret(Optional<StatementNode> node)throws Exception {
+        currentStatement = node;
         while(loop) {
+            nextIndex = statements.indexOf(currentStatement) + 1;
             currentStatement.ifPresent(state -> {
+                if (state instanceof DataNode dataNode) {
+                    statements.remove(0);
+                    currentStatement = statements.get(0);
+                }
                 if (state instanceof ReadNode readNode) {
-                    List<VariableNode> vars = readNode.getVars();
-                    for (VariableNode varNode : vars) {
-                        String varName = varNode.getName();
-                        var data = dataStatements.get(0);
-                        if (data instanceof StringNode) {
-                            if (varName.contains("$")) {
-                                stringVars.put(varName, ((StringNode) data).getMember());
-                                dataStatements.remove(0);
-                            } else try {
-                                throw new Exception("Mismatched types in DATA and READ");
-                            } catch (Exception e) {
-                                throw new RuntimeException(e);
-                            }
-                        } else if (data instanceof FloatNode) {
-                            if (varName.contains("%")) {
-                                floatVars.put(varName, ((FloatNode) data).getNumber());
-                                dataStatements.remove(0);
-                            } else try {
-                                throw new Exception("Mismatched types in DATA and READ");
-                            } catch (Exception e) {
-                                throw new RuntimeException(e);
-                            }
-                        } else {
-                            intVars.put(varName, ((IntegerNode) data).getNumber());
-                            dataStatements.remove(0);
-                        }
-                    }
-                    if (dataStatements.isEmpty()) {
+                    if(dataStatements.isEmpty()) {
                         try {
                             throw new Exception("No data available for READ operation.");
                         } catch (Exception e) {
                             throw new RuntimeException(e);
                         }
                     }
-                }else if (node instanceof AssignmentNode assignmentNode) {
+                    List<VariableNode> vars = readNode.getVars();
+                    int i = -1;
+                    var data = dataStatements.get(0);
+                    var nodes = ((DataNode) data).getData();
+                    for (VariableNode varNode : vars) {
+                        String varName = varNode.getName();
+                        i++;
+                        var currNode = nodes.get(i);
+                            if (currNode instanceof StringNode stringNode) {
+                                if (varName.contains("$")){
+                                    stringVars.put(varName, stringNode.getMember());
+                                } else try {
+                                    throw new Exception("Mismatched types in DATA and READ");
+                                } catch (Exception e) {
+                                    throw new RuntimeException(e);
+                                }
+                            } else if (currNode instanceof FloatNode floatNode) {
+                                if (varName.contains("%")) {
+                                    floatVars.put(varName, floatNode.getNumber());
+                                } else try {
+                                    throw new Exception("Mismatched types in DATA and READ");
+                                } catch (Exception e) {
+                                    throw new RuntimeException(e);
+                                }
+                            } else if (currNode instanceof IntegerNode integerNode){
+                                intVars.put(varName, integerNode.getNumber());
+                            }
+                    }
+                    dataStatements.remove(0);
+                    currentStatement = statements.get(nextIndex);
+                    statements.remove(nextIndex - 1);
+                }else if (state instanceof AssignmentNode assignmentNode) {
                     var assignType = assignmentNode.getExpression();
-                    var varName = assignmentNode.getTarget();
-                    if (assignType instanceof IntegerNode) {
-                        intVars.put(String.valueOf(varName), Integer.parseInt(String.valueOf(assignType)));
-                    }if (assignType instanceof FloatNode) {
-                        floatVars.put(String.valueOf(varName), Float.parseFloat(String.valueOf(assignType)));
-                    }if (assignType instanceof StringNode) {
-                        stringVars.put(String.valueOf(varName), String.valueOf(assignType));
-                    }if (assignType instanceof MathOpNode mathOp) {
-                        if(mathOp.getLeft() instanceof FloatNode) {
-                            float exp = evaluateFloat(assignmentNode);
-                            floatVars.put(String.valueOf(varName), exp);
-                        }else if(mathOp.getLeft() instanceof IntegerNode) {
-                            int exp = evaluateInteger(assignmentNode);
-                            intVars.put(String.valueOf(varName), exp);
+                    var variable = assignmentNode.getTarget();
+                    var name = ((VariableNode) variable).getName();
+                    if (assignType instanceof IntegerNode integerNode) {
+                        int num = integerNode.getNumber();
+                        intVars.put(name, num);
+                    }else if (assignType instanceof FloatNode floatNode) {
+                        float num = floatNode.getNumber();
+                        floatVars.put(name, num);
+                    }else if (assignType instanceof StringNode stringNode) {
+                        String val = stringNode.getMember();
+                        stringVars.put(name, val);
+                    }else if (assignType instanceof MathOpNode mathOp) {
+                        if(mathOp.getLeft() instanceof FloatNode ||
+                                mathOp.getRight().orElseThrow() instanceof FloatNode) {
+                            float exp = evaluateFloat(assignType);
+                            floatVars.put(name, exp);
+                        }else if(mathOp.getLeft() instanceof IntegerNode ||
+                                mathOp.getRight().orElseThrow() instanceof IntegerNode) {
+                            int exp = evaluateInteger(assignType);
+                            intVars.put(name, exp);
                         }
                     }
-                } else if (node instanceof InputNode inputNode) {
+                    currentStatement = statements.get(nextIndex);
+                    statements.remove(nextIndex - 1);
+                } else if (state instanceof InputNode inputNode) {
                     List<Node> nodeList = inputNode.getInputList();
                     List<String> toBePrinted = new ArrayList<>();
                     if (nodeList.get(0) instanceof StringNode) {
@@ -97,23 +118,25 @@ public class Interpreter {
                     System.out.println(toBePrinted);
                     toBePrinted.clear();
                     for (Node value : nodeList) {
-                        if (value instanceof VariableNode) {
-                            VariableNode variableNode = (VariableNode) nodeList.get(0);
+                        if (value instanceof VariableNode variableNode) {
                             String varName = variableNode.getName();
                             Scanner scanner = new Scanner(System.in);
-                            System.out.println("Insert value for :" + varName);
+                            System.out.print("Insert value for: " + varName + " ");
                             var input = scanner.nextLine();
-                            stringVars.put(varName, input);
+                            if (varName.contains("$")) stringVars.put(varName, input);
+                            else if (varName.contains("%")) floatVars.put(varName, Float.parseFloat(input));
+                            else intVars.put(varName, Integer.parseInt(input));
                         }
                     }
-                } else if (node instanceof PrintNode printNode) {
-                    List<Node> nodeList = new ArrayList<>();
+                    currentStatement = statements.get(nextIndex);
+                    statements.remove(nextIndex - 1);
+                } else if (state instanceof PrintNode printNode) {
+                    List<Node> nodeList = printNode.getPrintList();
                     List<String> toBePrinted = new ArrayList<>();
                     for (var nodes : nodeList) {
-                        if (nodes instanceof StringNode) {
-                            toBePrinted.add(String.valueOf(nodes));
-                        }
-                        if (nodes instanceof MathOpNode mathNode) {
+                        if (nodes instanceof StringNode stringNode) {
+                            toBePrinted.add(stringNode.getMember());
+                        } else if (nodes instanceof MathOpNode mathNode) {
                             if (mathNode.getLeft() instanceof IntegerNode) {
                                 int num = evaluateInteger(mathNode);
                                 toBePrinted.add(String.valueOf(num));
@@ -121,73 +144,91 @@ public class Interpreter {
                                 float num = evaluateFloat(mathNode);
                                 toBePrinted.add(String.valueOf(num));
                             }
+                        } else if (nodes instanceof FunctionNode functionNode) {
+                            var params = functionNode.getParams();
+                            switch (functionNode.getName()) {
+                                case "LEFT$":
+                                    toBePrinted.add(left(String.valueOf(params.get(0)), Integer.parseInt(String.valueOf(params.get(1)))));
+                                    break;
+                                case "MID$":
+                                    toBePrinted.add(mid(String.valueOf(params.get(0)), Integer.parseInt(String.valueOf(params.get(1))), Integer.parseInt(String.valueOf(params.get(2)))));
+                                    break;
+                                case "RIGHT$":
+                                    toBePrinted.add(right(String.valueOf(params.get(0)), Integer.parseInt(String.valueOf(params.get(1)))));
+                                    break;
+                                case "NUM$":
+                                    if (params.get(0) instanceof FloatNode floatNode)
+                                        toBePrinted.add(numFloat(floatNode.getNumber()));
+                                    else toBePrinted.add(numInt(Integer.parseInt(String.valueOf(params.get(0)))));
+                                    break;
+                                case "VAL":
+                                    toBePrinted.add(String.valueOf(valInt(String.valueOf(params.get(0)))));
+                                    break;
+                                case "VAL%":
+                                    toBePrinted.add(String.valueOf(valFloat(String.valueOf(params.get(0)))));
+                                    break;
+                                default:
+                                    throw new RuntimeException("Unknown function: " + functionNode.getName());
+                            }
+                        } else if (nodes instanceof VariableNode variableNode){
+                            var variable = lookupVariable(variableNode.getName());
+                            toBePrinted.add(variable);
+                            if (variable == null){
+                                throw new RuntimeException("Unknown variable: " + nodes);
+                            }
                         }
                     }
                     System.out.println(toBePrinted);
-                } else if (node instanceof IfNode) {
-                    BooleanExpression booleanExpression = (BooleanExpression) node;
-                    var evaluatedLeft = 0.0;
-                    var evaluatedRight = 0.0;
-                    boolean isTrue = false;
-                    var left = booleanExpression.getLeftExpression();
-                    if (left instanceof IntegerNode) {
-                        evaluatedLeft = evaluateInteger(left);
-                        var right = booleanExpression.getRightExpression();
-                        evaluatedRight = evaluateInteger(right);
-                    }
-                    if (left instanceof FloatNode) {
-                        evaluatedLeft = evaluateFloat(left);
-                        var right = booleanExpression.getRightExpression();
-                        evaluatedRight = evaluateFloat(right);
-                    }
-                    if (left instanceof MathOpNode mathOpNode) {
-                        var leftMath = mathOpNode.getLeft();
-                        if (leftMath instanceof IntegerNode) {
-                            evaluatedLeft = evaluateInteger(left);
+                    currentStatement = statements.get(nextIndex);
+                    statements.remove(nextIndex - 1);
+                } else if (state instanceof IfNode ifNode) {
+                    var expression = ifNode.getBool();
+                    expression.ifPresent(exp -> {
+                        isTrue = false;
+                        if (exp instanceof BooleanExpression booleanExpression) {
+                            var left = booleanExpression.getLeftExpression();
                             var right = booleanExpression.getRightExpression();
-                            evaluatedRight = evaluateInteger(right);
+                            var cond = booleanExpression.getCondition();
+                            var evaluatedRight = 0.0;
+                            var evaluatedLeft = 0.0;
+                            if (right instanceof IntegerNode ||
+                                    left instanceof IntegerNode) {
+                                evaluatedRight = evaluateInteger(right);
+                                evaluatedLeft = evaluateInteger(left);
+                            }else if (right instanceof FloatNode ||
+                                    left instanceof FloatNode) {
+                                evaluatedLeft = evaluateFloat(right);
+                                evaluatedRight = evaluateFloat(left);
+                            } switch (cond) {
+                                case LESSEQUAL:
+                                    isTrue = evaluatedLeft <= evaluatedRight;
+                                    break;
+                                case GREATEREQUAL:
+                                    isTrue = evaluatedLeft >= evaluatedRight;
+                                    break;
+                                case EQUALS:
+                                    isTrue = evaluatedLeft == evaluatedRight;
+                                    break;
+                                case NOTEQUAL:
+                                    isTrue = evaluatedLeft != evaluatedRight;
+                                    break;
+                                case LESSTHAN:
+                                    isTrue = evaluatedLeft < evaluatedRight;
+                                    break;
+                                case GREATERTHAN:
+                                    isTrue = evaluatedLeft > evaluatedRight;
+                                    break;
+                            }if (isTrue){
+                                String label = ifNode.getEndLabel();
+                                skippedStatement = Optional.ofNullable(labels.get(label));
+                            }
                         }
-                        if (leftMath instanceof FloatNode) {
-                            evaluatedLeft = evaluateFloat(left);
-                            var right = booleanExpression.getRightExpression();
-                            evaluatedRight = evaluateFloat(right);
-                        }
-                    }
-                    if (left instanceof VariableNode) {
-                        evaluatedLeft = Integer.parseInt(lookupVariable(String.valueOf(left)));
-                        var right = booleanExpression.getRightExpression();
-                        evaluatedRight = evaluateInteger(right);
-                    }
-                    var conditional = booleanExpression.getCondition();
-                    switch (conditional) {
-                        case LESSTHAN:
-                            isTrue = evaluatedLeft < evaluatedRight;
-                            break;
-                        case GREATERTHAN:
-                            isTrue = evaluatedLeft > evaluatedRight;
-                            break;
-                        case LESSEQUAL:
-                            isTrue = evaluatedLeft <= evaluatedRight;
-                            break;
-                        case GREATEREQUAL:
-                            isTrue = evaluatedLeft >= evaluatedRight;
-                            break;
-                        case EQUAL:
-                            isTrue = evaluatedLeft == evaluatedRight;
-                            break;
-                        case NOTEQUAL:
-                            isTrue = evaluatedLeft != evaluatedRight;
-                            break;
-                    }
-                    if (isTrue) {
-                        IfNode ifNode = (IfNode) node;
-                        String str = ifNode.getEndLabel();
-                        var label = labels.get(str);
-                        //labels.put(str, (LabeledStatementNode) currentStatement);
-                    }
-                } else if (node instanceof GoSubNode) {
+                    });
+                    currentStatement = skippedStatement;
+                    statements.remove(0);
+                } else if (state instanceof GoSubNode) {
 
-                } else if (node instanceof ForNode forNode) {
+                } else if (state instanceof ForNode forNode) {
                     /*int increment = 1;
                     //int start = Integer.parseInt(String.valueOf(forNode.getStart()));
                     int end = Integer.parseInt(String.valueOf(forNode.getEnd()));
@@ -206,14 +247,22 @@ public class Interpreter {
                 } else if (node instanceof NextNode) {
                     StatementNode returnStatement = statements.pop();
                     returnStatement = currentStatement.next;
-                } else if (node instanceof ReturnNode) {
-                    Optional<StatementNode> returnStatement = statements.pop();
-                    returnStatement = Optional.ofNullable(currentStatement.next);
-                */} else if (node instanceof EndNode) {
+                */} else if (state instanceof LabeledStatementNode labeledStatementNode) {
+                    try {
+                        interpret(labeledStatementNode.getStatement());
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                } else if (state instanceof ReturnNode) {
+                    statements.remove(currentStatement);
+                    currentStatement = statements.get(0);
+                } else if (state instanceof EndNode) {
                     loop = false;
                 }
             });
-            currentStatement = statements.get(1);
+            //statements.remove(0);
+            //if(loop) currentStatement = statements.get(0);\
+            if(!loop) break;
         }
     }
 
@@ -228,19 +277,19 @@ public class Interpreter {
             if (variable != null) {
                 return Integer.parseInt(variable);
             }
-        } if(node instanceof IntegerNode integerNode){
+        } else if(node instanceof IntegerNode integerNode){
             return integerNode.getNumber();
-        } if(node instanceof MathOpNode mathOpNode){
-            var left = evaluateInteger(mathOpNode);
+        } else if(node instanceof MathOpNode mathOpNode){
+            var left = evaluateInteger(mathOpNode.getLeft());
             var op = mathOpNode.getOperationType();
-            var right = evaluateInteger(mathOpNode);
+            var right = evaluateInteger(mathOpNode.getRight().orElseThrow());
             return switch (op) {
                 case SUBTRACT -> left - right;
                 case ADD -> left + right;
                 case DIVIDE -> left / right;
                 case MULTIPLY -> left * right;
             };
-        } if(node instanceof FunctionNode functionNode){
+        } else if(node instanceof FunctionNode functionNode){
             String functionName = functionNode.getName();
             List<Node> params = functionNode.getParams();
             String str = String.valueOf(params.get(0));
@@ -258,23 +307,19 @@ public class Interpreter {
     public float evaluateFloat(Node node){
         if(node instanceof VariableNode variableNode){
             return Float.parseFloat(Objects.requireNonNull(lookupVariable(variableNode.getName())));
-        }if(node instanceof FloatNode floatNode){
+        } else if(node instanceof FloatNode floatNode){
             return floatNode.getNumber();
-        }if(node instanceof MathOpNode mathOpNode){
-            var left = evaluateFloat(mathOpNode);
+        } else if(node instanceof MathOpNode mathOpNode){
+            var left = evaluateFloat(mathOpNode.getLeft());
             var op = mathOpNode.getOperationType();
-            var right = evaluateFloat(mathOpNode);
-            switch (op){
-                case SUBTRACT:
-                    return left - right;
-                case ADD:
-                    return left + right;
-                case DIVIDE:
-                    return left / right;
-                case MULTIPLY:
-                    return left * right;
-            }
-        } if(node instanceof FunctionNode functionNode){
+            var right = evaluateFloat(mathOpNode.getRight().orElseThrow());
+            return switch (op) {
+                case SUBTRACT -> left - right;
+                case ADD -> left + right;
+                case DIVIDE -> left / right;
+                case MULTIPLY -> left * right;
+            };
+        } else if(node instanceof FunctionNode functionNode){
             String functionName = functionNode.getName();
             List<Node> params = functionNode.getParams();
             String str = String.valueOf(params.get(0));
@@ -303,7 +348,7 @@ public class Interpreter {
      *
      * @param node
      */
-    private void dataSearch(StatementsNode node){
+    public void dataSearch(StatementsNode node){
         List<Optional<StatementNode>> statements = node.getStatements();
         for(Optional<StatementNode> statement : statements){
             statement.ifPresent(state -> {

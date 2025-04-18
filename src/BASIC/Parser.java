@@ -10,6 +10,8 @@ public class Parser {
     private final String[] expVal = {"LESSTHAN", "GREATERTHAN", "LESSEQUAL", "GREATEREQUAL", "EQUAL", "NOTEQUAL"}; //List of possible conditionals
     private final String[] functions = {"MID", "RANDOM", "LEFT", "RIGHT", "NUM", "VAL"};
     TokenManager tokenM; //Member of @{code TokenManager} that controls the stream of tokens
+    private String nextVar;
+    List<Optional<StatementNode>> statementsList = new ArrayList<>();
 
     /**
      * Adds all the tokens into the new LinkedList
@@ -198,13 +200,18 @@ public class Parser {
      * @return list of {@code StatementsNode}
      */
     public StatementNode statements() throws Exception {
-        List<Optional<StatementNode>> statementsList = new ArrayList<>();
         while (tokenM.moreTokens()){
             Optional<Token.TokenType> op = tokenM.peek(0);
             if (op.isEmpty()) break;
             acceptSeparators();
             Optional<StatementNode> statement = statement();
             statementsList.add(statement);
+            var lastStatement = statementsList.get(statementsList.size() -1);
+            lastStatement.ifPresent(state -> {
+                if(state instanceof ForNode){
+                    statementsList.add(Optional.of(new NextNode(nextVar)));
+                }
+            });
         }
         return new StatementsNode(statementsList);
     }
@@ -338,15 +345,13 @@ public class Parser {
                 var dNode = token.get(0).getTokenValue();
                 switch(dNode){
                     case WORD:
+                    case NUMBER:
                         dataVar = expression();
-                        dataList.add(dataVar);
+                        break;
                     case STRINGLITERAL:
                         dataVar = new StringNode(token.get(0).getValue());
                         tokenM.matchAndRemove(Token.TokenType.STRINGLITERAL);
                         break;
-                    case NUMBER:
-                        dataVar = expression();
-                        dataList.add(dataVar);
                 }
                 dataList.add(dataVar);
             } while (tokenM.matchAndRemove(Token.TokenType.COMMA).equals(Optional.of(Token.TokenType.COMMA)));
@@ -404,8 +409,12 @@ public class Parser {
         statements.add(state);
         acceptSeparators();
         }
-        if(tokenM.matchAndRemove(Token.TokenType.NEXT).equals(Optional.of(Token.TokenType.NEXT))){
-            return Optional.of(new ForNode(variable,new IntegerNode(end), new IntegerNode(increment), statements));
+        if(tokenM.matchAndRemove(Token.TokenType.NEXT).equals(Optional.of(Token.TokenType.NEXT))) {
+            if (token.get(0).getTokenValue().equals(Token.TokenType.WORD)) {
+                nextVar = token.get(0).getValue();
+                tokenM.matchAndRemove(Token.TokenType.WORD);
+                return Optional.of(new ForNode(variable, new IntegerNode(end), new IntegerNode(increment), statements));
+            }
         }
         return Optional.empty();
     }
