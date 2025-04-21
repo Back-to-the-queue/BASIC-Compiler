@@ -6,7 +6,7 @@ package BASIC;
  *
  */
 public class AssignmentNode extends StatementNode{
-    public Node target;
+    public Node variable;
     public Node expression;
 
     /**
@@ -15,12 +15,12 @@ public class AssignmentNode extends StatementNode{
      * @param e the expression
      */
     public AssignmentNode(Node t, Node e){
-        this.target = t;
+        this.variable = t;
         this.expression = e;
     }
 
-    public Node getTarget() {
-        return this.target;
+    public Node getVariable() {
+        return variable;
     }
     public Node getExpression() {return expression;}
 
@@ -30,6 +30,6 @@ public class AssignmentNode extends StatementNode{
      */
     @Override
     public String toString() {
-        return "AssignmentNode[" + target.toString() + "," + expression.toString() + "]";
+        return "AssignmentNode[" + variable.toString() + "," + expression.toString() + "]";
     }
 }

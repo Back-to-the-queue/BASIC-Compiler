@@ -1,48 +1,48 @@
 package BASIC;
 import java.util.*;
 
-//Fix function in parser, change to node so it can be accessed by subroutines and expression
-//fix mathop in assignment
-
-
 /**
  * A {@code Interpreter} that handles the AST of Nodes created by the parser
  * @author Nicolas Quesada (nquesada@albany.edu)
  */
 public class Interpreter {
     public static Random randomNum = new Random();
-    public List<Node> dataStatements = new LinkedList<>();
+    public List<Node> dataStatements = new ArrayList<>();
     public HashMap<String, LabeledStatementNode> labels = new HashMap<>();
     public HashMap<String, String> stringVars = new HashMap<>();
     public HashMap<String, Integer> intVars = new HashMap<>();
     public HashMap<String, Float> floatVars = new HashMap<>();
     List<Optional<StatementNode>> statements;
-    public boolean loop = true;
-    public boolean isTrue = false;
     Optional<StatementNode> currentStatement;
     Optional<StatementNode> skippedStatement;
-    public int nextIndex;
+    Queue<StatementNode> queue = new LinkedList<>();
+    List<LabeledStatementNode> processedLabels = new ArrayList<>();
+    private boolean loop = true;
+    private boolean isTrue = false;
+    private int forStart = 0;
 
     public Interpreter(StatementsNode statements) {
         this.statements = statements.getStatements();
         dataSearch(statements);
         labelSearch(statements);
+        for (var node : this.statements) {
+            node.ifPresent(queue::offer);
+        }
     }
 
     /**
      *Evaluates the statement nodes
      * @param node statement node to be evaluated
-     * @throws Exception If the program uses incorrect syntax
      */
-    public void interpret(Optional<StatementNode> node)throws Exception {
+    public void interpret(Optional<StatementNode> node){
         currentStatement = node;
-        while(loop) {
-            nextIndex = statements.indexOf(currentStatement) + 1;
+        if(node.equals(Optional.ofNullable(queue.peek()))){queue.poll();}
+        do {
             currentStatement.ifPresent(state -> {
-                if (state instanceof DataNode dataNode) {
-                    statements.remove(0);
-                    currentStatement = statements.get(0);
+                if(processedLabels.contains(state)){
+                    state = queue.poll();
                 }
+                if (state instanceof DataNode) {currentStatement = Optional.ofNullable(queue.poll());}
                 if (state instanceof ReadNode readNode) {
                     if(dataStatements.isEmpty()) {
                         try {
@@ -80,11 +80,10 @@ public class Interpreter {
                             }
                     }
                     dataStatements.remove(0);
-                    currentStatement = statements.get(nextIndex);
-                    statements.remove(nextIndex - 1);
+                    currentStatement = Optional.ofNullable(queue.poll());
                 }else if (state instanceof AssignmentNode assignmentNode) {
                     var assignType = assignmentNode.getExpression();
-                    var variable = assignmentNode.getTarget();
+                    var variable = assignmentNode.getVariable();
                     var name = ((VariableNode) variable).getName();
                     if (assignType instanceof IntegerNode integerNode) {
                         int num = integerNode.getNumber();
@@ -106,8 +105,7 @@ public class Interpreter {
                             intVars.put(name, exp);
                         }
                     }
-                    currentStatement = statements.get(nextIndex);
-                    statements.remove(nextIndex - 1);
+                    currentStatement = Optional.ofNullable(queue.poll());
                 } else if (state instanceof InputNode inputNode) {
                     List<Node> nodeList = inputNode.getInputList();
                     List<String> toBePrinted = new ArrayList<>();
@@ -128,8 +126,7 @@ public class Interpreter {
                             else intVars.put(varName, Integer.parseInt(input));
                         }
                     }
-                    currentStatement = statements.get(nextIndex);
-                    statements.remove(nextIndex - 1);
+                    currentStatement = Optional.ofNullable(queue.poll());
                 } else if (state instanceof PrintNode printNode) {
                     List<Node> nodeList = printNode.getPrintList();
                     List<String> toBePrinted = new ArrayList<>();
@@ -170,17 +167,16 @@ public class Interpreter {
                                 default:
                                     throw new RuntimeException("Unknown function: " + functionNode.getName());
                             }
-                        } else if (nodes instanceof VariableNode variableNode){
+                        } else if (nodes instanceof VariableNode variableNode) {
                             var variable = lookupVariable(variableNode.getName());
                             toBePrinted.add(variable);
-                            if (variable == null){
+                            if (variable == null) {
                                 throw new RuntimeException("Unknown variable: " + nodes);
                             }
                         }
                     }
                     System.out.println(toBePrinted);
-                    currentStatement = statements.get(nextIndex);
-                    statements.remove(nextIndex - 1);
+                    currentStatement = Optional.ofNullable(queue.poll());
                 } else if (state instanceof IfNode ifNode) {
                     var expression = ifNode.getBool();
                     expression.ifPresent(exp -> {
@@ -225,51 +221,52 @@ public class Interpreter {
                         }
                     });
                     currentStatement = skippedStatement;
-                    statements.remove(0);
                 } else if (state instanceof GoSubNode) {
-
+                    intVars = null;
                 } else if (state instanceof ForNode forNode) {
-                    /*int increment = 1;
-                    //int start = Integer.parseInt(String.valueOf(forNode.getStart()));
-                    int end = Integer.parseInt(String.valueOf(forNode.getEnd()));
-                    var isIncrement = forNode.getIncrement();
-                    //if (isIncrement.isPresent()) increment = Integer.parseInt(String.valueOf(increment));
-                    var exists = intVars.get(forNode.getVariable());
-                    if (exists == null) {
-                        //intVars.put(String.valueOf(forNode.getVariable()), start);
+                    int increment = evaluateInteger(forNode.getIncrement());
+                    var variable = forNode.getVariable();
+                    variable.ifPresent(i -> {
+                        if(i instanceof AssignmentNode assignmentNode) {
+                            forStart = evaluateInteger(assignmentNode.getExpression());
+                            var preForVar = assignmentNode.getVariable();
+                            var forVar = ((VariableNode) preForVar).getName();
+                            intVars.put(String.valueOf(forVar), forStart);
+                        }
+                    });
+                    int end = evaluateInteger(forNode.getEnd());
+                    var statements = forNode.getStatements();
+                    while(forStart <= end) {
+                        for (var statement : statements) {
+                            interpret(statement);
+                        }
+                        forStart += increment;
                     }
-                    if (start > end) {
-                        do {
-                            currentStatement = currentStatement.next;
-                        } while (!(node instanceof NextNode));
-                    } else statements.push(forNode);
-                    start += increment;
-                } else if (node instanceof NextNode) {
-                    StatementNode returnStatement = statements.pop();
-                    returnStatement = currentStatement.next;
-                */} else if (state instanceof LabeledStatementNode labeledStatementNode) {
+                } else if (state instanceof WhileNode whileNode) {
+
+                } else if (state instanceof NextNode) {
+                    currentStatement = Optional.ofNullable(queue.poll());
+                } else if (state instanceof LabeledStatementNode labeledStatementNode) {
                     try {
+                        loop = false;
                         interpret(labeledStatementNode.getStatement());
+                        processedLabels.add(labeledStatementNode);
+                        loop = true;
                     } catch (Exception e) {
                         throw new RuntimeException(e);
                     }
                 } else if (state instanceof ReturnNode) {
-                    statements.remove(currentStatement);
-                    currentStatement = statements.get(0);
+                    currentStatement = Optional.ofNullable(queue.poll());
                 } else if (state instanceof EndNode) {
                     loop = false;
                 }
             });
-            //statements.remove(0);
-            //if(loop) currentStatement = statements.get(0);\
-            if(!loop) break;
-        }
+        } while(loop);
     }
 
     /**
      *Evaluates Integer value
      * @return evaluated integer
-     * @throws Exception
      */
     public int evaluateInteger(Node node){
         if(node instanceof VariableNode variableNode){
@@ -302,7 +299,6 @@ public class Interpreter {
     /**
      *Evaluates Float value
      * @return evaluated float value
-     * @throws Exception
      */
     public float evaluateFloat(Node node){
         if(node instanceof VariableNode variableNode){
@@ -346,7 +342,7 @@ public class Interpreter {
 
     /**
      *
-     * @param node
+     * @param node the original node that is being passed through
      */
     public void dataSearch(StatementsNode node){
         List<Optional<StatementNode>> statements = node.getStatements();
@@ -361,7 +357,7 @@ public class Interpreter {
 
     /**
      *
-     * @param node
+     * @param node the original node that is being passed through
      */
     private void labelSearch(StatementsNode node){
         List<Optional<StatementNode>> statements = node.getStatements();

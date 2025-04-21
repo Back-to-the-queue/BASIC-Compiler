@@ -89,18 +89,51 @@ public class InterpreterTest {
         assertEquals("WORLD", interpreter.stringVars.get("B$"));
     }
 
-   @Test
+    @Test
     public void testIfNodeConditionTrue() throws Exception {
-       Lexer lexer = new Lexer(" C = 28 \nIF C < 40 THEN printCold\nZ = 63  \n printCold: \n PRINT \"Its cold\"\nRETURN \nEND");
-       lexer.lex();
-       java.util.LinkedList<Token> tokens = Lexer.tokenList;
-       Parser parser = new Parser(tokens);
-       StatementsNode statements = parser.parse();
-       Interpreter interpreter = new Interpreter(statements);
-       interpreter.interpret(statements.getCurrentStatement());
+        Lexer lexer = new Lexer("""
+        C = 28
+        IF C < 40 THEN printCold
+        Z = 63
+        printCold:
+        PRINT "Its cold"
+        RETURN
+        END
+        """);
+        lexer.lex();
+        LinkedList<Token> tokens = Lexer.tokenList;
+        Parser parser = new Parser(tokens);
+        StatementsNode statements = parser.parse();
+        Interpreter interpreter = new Interpreter(statements);
+        interpreter.interpret(statements.getCurrentStatement());
 
-        //assertEquals("Passed", ((StringNode) ((PrintNode) label.getStatement()).getNodes().get(0)).getMember());
+        String output = outputStream.toString().trim();
+        assertTrue(output.contains("Its cold"), "Expected output to contain 'Its cold'");
     }
+
+    @Test
+    public void testForLoop() throws Exception {
+        Lexer lexer = new Lexer("""
+        FOR I = 1 TO 5
+            PRINT I
+        NEXT I
+        END
+    """);
+        lexer.lex();
+        LinkedList<Token> tokens = Lexer.tokenList;
+        Parser parser = new Parser(tokens);
+        StatementsNode statements = parser.parse();
+        Interpreter interpreter = new Interpreter(statements);
+        interpreter.interpret(statements.getCurrentStatement());
+
+        String output = outputStream.toString().trim();
+        for (int i = 1; i <= 5; i++) {
+            assertTrue(output.contains(String.valueOf(i)), "Expected output to contain " + i);
+        }
+        assertEquals(5, interpreter.intVars.get("I")); // Final value of loop variable
+    }
+
+
 
     @Test
     public void testFunctionRandom() {
