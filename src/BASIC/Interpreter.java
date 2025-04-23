@@ -1,6 +1,10 @@
 package BASIC;
 import java.util.*;
 
+//Replace queue with stack and work on flow control
+//pushing onto the stack and then popping off
+//focus on if and for repeating statements
+
 /**
  * A {@code Interpreter} that handles the AST of Nodes created by the parser
  * @author Nicolas Quesada (nquesada@albany.edu)
@@ -12,22 +16,23 @@ public class Interpreter {
     public HashMap<String, String> stringVars = new HashMap<>();
     public HashMap<String, Integer> intVars = new HashMap<>();
     public HashMap<String, Float> floatVars = new HashMap<>();
-    List<Optional<StatementNode>> statements;
     Optional<StatementNode> currentStatement;
     Optional<StatementNode> skippedStatement;
-    Queue<StatementNode> queue = new LinkedList<>();
-    List<LabeledStatementNode> processedLabels = new ArrayList<>();
+    Queue<Optional<StatementNode>> queue = new LinkedList<>();
     private boolean loop = true;
     private boolean isTrue = false;
     private int forStart = 0;
+    private String forVar = null;
+    private Optional<StatementNode> nextNode = Optional.empty();
 
     public Interpreter(StatementsNode statements) {
-        this.statements = statements.getStatements();
         dataSearch(statements);
         labelSearch(statements);
-        for (var node : this.statements) {
-            node.ifPresent(queue::offer);
+        if (!statements.getStatements().isEmpty()) {
+            Optional<StatementNode> first = statements.getStatements().get(0);
+            first.get().buildList(statements);
         }
+
     }
 
     /**
@@ -36,13 +41,11 @@ public class Interpreter {
      */
     public void interpret(Optional<StatementNode> node){
         currentStatement = node;
-        if(node.equals(Optional.ofNullable(queue.peek()))){queue.poll();}
         do {
+            if(currentStatement.get().getNext() != null){
+                nextNode = Objects.requireNonNull(currentStatement).flatMap(StatementNode::getNext);
+            } else break;
             currentStatement.ifPresent(state -> {
-                if(processedLabels.contains(state)){
-                    state = queue.poll();
-                }
-                if (state instanceof DataNode) {currentStatement = Optional.ofNullable(queue.poll());}
                 if (state instanceof ReadNode readNode) {
                     if(dataStatements.isEmpty()) {
                         try {
@@ -80,7 +83,7 @@ public class Interpreter {
                             }
                     }
                     dataStatements.remove(0);
-                    currentStatement = Optional.ofNullable(queue.poll());
+                    //currentStatement = Optional.ofNullable(queue.poll());
                 }else if (state instanceof AssignmentNode assignmentNode) {
                     var assignType = assignmentNode.getExpression();
                     var variable = assignmentNode.getVariable();
@@ -105,7 +108,7 @@ public class Interpreter {
                             intVars.put(name, exp);
                         }
                     }
-                    currentStatement = Optional.ofNullable(queue.poll());
+                    //currentStatement = Optional.ofNullable(queue.poll());
                 } else if (state instanceof InputNode inputNode) {
                     List<Node> nodeList = inputNode.getInputList();
                     List<String> toBePrinted = new ArrayList<>();
@@ -126,7 +129,7 @@ public class Interpreter {
                             else intVars.put(varName, Integer.parseInt(input));
                         }
                     }
-                    currentStatement = Optional.ofNullable(queue.poll());
+                    //currentStatement = Optional.ofNullable(queue.poll());
                 } else if (state instanceof PrintNode printNode) {
                     List<Node> nodeList = printNode.getPrintList();
                     List<String> toBePrinted = new ArrayList<>();
@@ -176,7 +179,7 @@ public class Interpreter {
                         }
                     }
                     System.out.println(toBePrinted);
-                    currentStatement = Optional.ofNullable(queue.poll());
+                    //currentStatement = Optional.ofNullable(queue.poll());
                 } else if (state instanceof IfNode ifNode) {
                     var expression = ifNode.getBool();
                     expression.ifPresent(exp -> {
@@ -230,37 +233,35 @@ public class Interpreter {
                         if(i instanceof AssignmentNode assignmentNode) {
                             forStart = evaluateInteger(assignmentNode.getExpression());
                             var preForVar = assignmentNode.getVariable();
-                            var forVar = ((VariableNode) preForVar).getName();
+                            forVar = ((VariableNode) preForVar).getName();
                             intVars.put(String.valueOf(forVar), forStart);
                         }
                     });
                     int end = evaluateInteger(forNode.getEnd());
                     var statements = forNode.getStatements();
                     while(forStart <= end) {
-                        for (var statement : statements) {
-                            interpret(statement);
+                        for (Optional<StatementNode> statement : statements) {
+                            queue.offer(statement);
+                            currentStatement.get().setNext(statement);
                         }
                         forStart += increment;
+                        intVars.put(forVar, forStart);
                     }
                 } else if (state instanceof WhileNode whileNode) {
 
                 } else if (state instanceof NextNode) {
-                    currentStatement = Optional.ofNullable(queue.poll());
-                } else if (state instanceof LabeledStatementNode labeledStatementNode) {
-                    try {
-                        loop = false;
-                        interpret(labeledStatementNode.getStatement());
-                        processedLabels.add(labeledStatementNode);
-                        loop = true;
-                    } catch (Exception e) {
-                        throw new RuntimeException(e);
-                    }
+                    nextNode = queue.poll();
+                } else if (state instanceof LabeledStatementNode) {
+                    queue.offer(Optional.of(state));
                 } else if (state instanceof ReturnNode) {
-                    currentStatement = Optional.ofNullable(queue.poll());
+                    nextNode = queue.poll();
                 } else if (state instanceof EndNode) {
                     loop = false;
                 }
             });
+            if(!currentStatement.equals(skippedStatement)){
+                currentStatement = nextNode;
+            }
         } while(loop);
     }
 

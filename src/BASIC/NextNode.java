@@ -2,7 +2,6 @@ package BASIC;
 
 public class NextNode extends StatementNode{
 
-    public String getNext() {return next;}
     private String next;
 
     /**
